@@ -9,9 +9,12 @@ class CScene
 public:
 	CScene(CPlayer *pPlayer);
 	virtual ~CScene();
-
+	int GetSceneNumber() const { return Scene_number; }
 private:
-	int							m_nObjects = 0;
+	int							Scene_number = 0;
+
+	static const int			m_nCubeObjects = 5;
+	CCubeObject*				m_pCubeObjects[m_nCubeObjects];
 
 	CPlayer*					m_pPlayer = NULL;
 
@@ -30,5 +33,6 @@ public:
 	virtual void OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 
 	CGameObject* PickObjectPointedByCursor(int xClient, int yClient, CCamera* pCamera);
+	CGameObject* CScene::PickObjectPointedByCursorOrthographic(int xClient, int yClient, CCamera* pCamera);
 };
 

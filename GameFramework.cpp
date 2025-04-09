@@ -97,7 +97,7 @@ void CGameFramework::ReleaseObjects()
 void CGameFramework::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 {
 	if (m_pScene) m_pScene->OnProcessingMouseMessage(hWnd, nMessageID, wParam, lParam);
-
+	
 	switch (nMessageID)
 	{
 	case WM_RBUTTONDOWN:
@@ -197,10 +197,12 @@ void CGameFramework::ProcessInput()
 		SetCursorPos(m_ptOldCursorPos.x, m_ptOldCursorPos.y);
 		if (cxMouseDelta || cyMouseDelta)
 		{
-			if (pKeyBuffer[VK_RBUTTON] & 0xF0)
-				m_pPlayer->Rotate(cyMouseDelta, 0.0f, -cxMouseDelta);
-			else
-				m_pPlayer->Rotate(cyMouseDelta, cxMouseDelta, 0.0f);
+			if (m_pScene->GetSceneNumber() != 0) {
+				if (pKeyBuffer[VK_RBUTTON] & 0xF0)
+					m_pPlayer->Rotate(cyMouseDelta, 0.0f, -cxMouseDelta);
+				else
+					m_pPlayer->Rotate(cyMouseDelta, cxMouseDelta, 0.0f);
+			}
 		}
 	}
 

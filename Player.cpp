@@ -63,25 +63,12 @@ void CPlayer::Move(float x, float y, float z)
 void CPlayer::Rotate(float fPitch, float fYaw, float fRoll)
 {
 	m_pCamera->Rotate(fPitch, fYaw, fRoll);
-	if (fPitch != 0.0f)
-	{
-		XMMATRIX mtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Right), XMConvertToRadians(fPitch));
-		m_xmf3Look = Vector3::TransformNormal(m_xmf3Look, mtxRotate);
-		m_xmf3Up = Vector3::TransformNormal(m_xmf3Up, mtxRotate);
-	}
 	if (fYaw != 0.0f)
 	{
 		XMMATRIX mtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Up), XMConvertToRadians(fYaw));
 		m_xmf3Look = Vector3::TransformNormal(m_xmf3Look, mtxRotate);
 		m_xmf3Right = Vector3::TransformNormal(m_xmf3Right, mtxRotate);
 	}
-	if (fRoll != 0.0f)
-	{
-		XMMATRIX mtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Look), XMConvertToRadians(fRoll));
-		m_xmf3Up = Vector3::TransformNormal(m_xmf3Up, mtxRotate);
-		m_xmf3Right = Vector3::TransformNormal(m_xmf3Right, mtxRotate);
-	}
-
 	m_xmf3Look = Vector3::Normalize(m_xmf3Look);
 	m_xmf3Right = Vector3::Normalize(Vector3::CrossProduct(m_xmf3Up, m_xmf3Look));
 	m_xmf3Up = Vector3::Normalize(Vector3::CrossProduct(m_xmf3Look, m_xmf3Right));

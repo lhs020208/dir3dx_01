@@ -193,7 +193,25 @@ int CGameObject::PickObjectByRayIntersection(XMVECTOR& xmvPickPosition, XMMATRIX
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-//
+
+CCubeObject::CCubeObject()
+{
+}
+
+CCubeObject::~CCubeObject()
+{
+}
+
+void CCubeObject::Animate(float fElapsedTime)
+{
+}
+
+void CCubeObject::Render(HDC hDCFrameBuffer, CCamera* pCamera)
+{
+	CGameObject::Render(hDCFrameBuffer, pCamera);
+}
+
+
 void CAxisObject::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 {
 	CGraphicsPipeline::SetWorldTransform(&m_xmf4x4World);

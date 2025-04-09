@@ -73,6 +73,17 @@ public:
 	int PickObjectByRayIntersection(XMVECTOR& xmPickPosition, XMMATRIX& xmmtxView, float* pfHitDistance);
 };
 
+class CCubeObject : public CGameObject
+{
+public:
+	CCubeObject();
+	virtual ~CCubeObject();
+
+	virtual void Animate(float fElapsedTime) override;
+	virtual void Render(HDC hDCFrameBuffer, CCamera* pCamera) override;
+};
+
+
 class CAxisObject : public CGameObject
 {
 public:

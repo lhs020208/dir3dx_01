@@ -105,6 +105,7 @@ void CCamera::Move(float x, float y, float z)
 
 void CCamera::Rotate(float fPitch, float fYaw, float fRoll)
 {
+
 	if (fPitch != 0.0f)
 	{
 		XMMATRIX mtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Right), XMConvertToRadians(fPitch));

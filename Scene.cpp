@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "Scene.h"
 #include "GraphicsPipeline.h"
 
@@ -13,8 +13,17 @@ CScene::~CScene()
 
 void CScene::BuildObjects()
 {
-	
-	//CCubeMesh* pCubeMesh = new CCubeMesh(4.0f, 4.0f, 4.0f);
+
+	CCubeMesh* pCubeMesh = new CCubeMesh(0.5f, 0.2f, 1.0f); // 정육면체 크기
+
+	for (int i = 0; i < m_nCubeObjects; i++)
+	{
+		m_pCubeObjects[i] = new CCubeObject();
+		m_pCubeObjects[i]->SetMesh(pCubeMesh);
+		m_pCubeObjects[i]->SetColor(RGB(255, 0, 0));
+		m_pCubeObjects[i]->SetPosition(-0.5f, -0.5f + 0.3f * i, 0.0f);
+		m_pCubeObjects[i]->UpdateBoundingBox();
+	}
 
 #ifdef _WITH_DRAW_AXIS
 	m_pWorldAxis = new CGameObject();
@@ -25,6 +34,9 @@ void CScene::BuildObjects()
 
 void CScene::ReleaseObjects()
 {
+	for (int i = 0; i < m_nCubeObjects; i++) {
+		if (m_pCubeObjects[i]) delete m_pCubeObjects[i];
+	}
 
 #ifdef _WITH_DRAW_AXIS
 	if (m_pWorldAxis) delete m_pWorldAxis;
@@ -33,7 +45,23 @@ void CScene::ReleaseObjects()
 
 void CScene::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 {
+	switch (nMessageID)
+	{
+	case WM_LBUTTONDOWN:
+		int x = LOWORD(lParam);
+		int y = HIWORD(lParam);
+		CCamera* pCamera = m_pPlayer->GetCamera();  //여기서 확보
+		CGameObject* pPickedObject = PickObjectPointedByCursorOrthographic(x, y, pCamera);
+
+		if (pPickedObject) {
+			Scene_number = 1;  //클릭된 오브젝트가 있으면 씬 전환
+
+		}
+		break;
+	
+	}
 }
+
 
 void CScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 {
@@ -67,6 +95,7 @@ void CScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wPar
 
 CGameObject* CScene::PickObjectPointedByCursor(int xClient, int yClient, CCamera* pCamera)
 {
+
 	XMFLOAT3 xmf3PickPosition;
 	xmf3PickPosition.x = (((2.0f * xClient) / (float)pCamera->m_Viewport.m_nWidth) - 1) / pCamera->m_xmf4x4PerspectiveProject._11;
 	xmf3PickPosition.y = -(((2.0f * yClient) / (float)pCamera->m_Viewport.m_nHeight) - 1) / pCamera->m_xmf4x4PerspectiveProject._22;
@@ -77,12 +106,48 @@ CGameObject* CScene::PickObjectPointedByCursor(int xClient, int yClient, CCamera
 
 	float fNearestHitDistance = FLT_MAX;
 	CGameObject* pNearestObject = NULL;
-	for (int i = 0; i < m_nObjects; i++)
+
+	for (int i = 0; i < m_nCubeObjects; i++)
 	{
-		float fHitDistance = FLT_MAX;
-		
+		int hit = m_pCubeObjects[i]->PickObjectByRayIntersection(xmvPickPosition, xmmtxView, &fNearestHitDistance);
+		if (hit > 0) {
+			pNearestObject = m_pCubeObjects[i];
+		}
 	}
+
 	return(pNearestObject);
+}
+CGameObject* CScene::PickObjectPointedByCursorOrthographic(int xClient, int yClient, CCamera* pCamera)
+{
+	// 직교 투영 뷰 영역 크기
+	float viewWidth = (float)pCamera->m_Viewport.m_nWidth;
+	float viewHeight = (float)pCamera->m_Viewport.m_nHeight;
+
+	// NDC(-1~1) 기준으로 변환
+	float px = ((2.0f * xClient) / viewWidth - 1.0f);
+	float py = (1.0f - (2.0f * yClient) / viewHeight);
+
+	// 월드 공간에서 픽 레이 원점 및 방향 계산
+	XMFLOAT3 xmf3RayOrigin = XMFLOAT3(px * viewWidth * 0.5f, py * viewHeight * 0.5f, 0.0f);
+	XMFLOAT3 xmf3RayDirection = XMFLOAT3(0.0f, 0.0f, 1.0f); // 직교 투영은 항상 Z+
+
+	// 뷰 공간 → 월드 공간 변환
+	XMVECTOR xmvRayOrigin = XMVector3TransformCoord(XMLoadFloat3(&xmf3RayOrigin), XMLoadFloat4x4(&pCamera->m_xmf4x4View));
+	XMVECTOR xmvRayDirection = XMVector3TransformNormal(XMLoadFloat3(&xmf3RayDirection), XMLoadFloat4x4(&pCamera->m_xmf4x4View));
+	xmvRayDirection = XMVector3Normalize(xmvRayDirection);
+
+	float fNearestHitDistance = FLT_MAX;
+	CGameObject* pNearestObject = NULL;
+
+	for (int i = 0; i < m_nCubeObjects; i++)
+	{
+		int hit = m_pCubeObjects[i]->PickObjectByRayIntersection(xmvRayOrigin, XMMatrixIdentity(), &fNearestHitDistance);
+		if (hit > 0) {
+			pNearestObject = m_pCubeObjects[i];
+		}
+	}
+
+	return pNearestObject;
 }
 
 
@@ -94,11 +159,25 @@ void CScene::Animate(float fElapsedTime)
 
 void CScene::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 {
+
 	CGraphicsPipeline::SetViewport(&pCamera->m_Viewport);
 
-	CGraphicsPipeline::SetViewPerspectiveProjectTransform(&pCamera->m_xmf4x4ViewPerspectiveProject);
-
-	if (m_pPlayer) m_pPlayer->Render(hDCFrameBuffer, pCamera);
+	if (Scene_number == 0) { // 메인메뉴
+		CGraphicsPipeline::SetViewOrthographicProjectTransform(&pCamera->m_xmf4x4ViewOrthographicProject);
+		
+		for (int i = 0; i < m_nCubeObjects; i++) {
+			m_pCubeObjects[i]->Render(hDCFrameBuffer, pCamera);
+		}
+		TextOut(hDCFrameBuffer, 135, 60, _T("Tutorial"), _tcslen(_T("Tutorial")));
+		TextOut(hDCFrameBuffer, 135, 135, _T("Level-1"), _tcslen(_T("Level-1")));
+		TextOut(hDCFrameBuffer, 135, 210, _T("Level-2"), _tcslen(_T("Level-2")));
+		TextOut(hDCFrameBuffer, 140, 280, _T("Start"), _tcslen(_T("Start")));
+		TextOut(hDCFrameBuffer, 140, 350, _T("End"), _tcslen(_T("End")));
+	}
+	else { // 그 외
+		CGraphicsPipeline::SetViewPerspectiveProjectTransform(&pCamera->m_xmf4x4ViewPerspectiveProject);
+		if (m_pPlayer) m_pPlayer->Render(hDCFrameBuffer, pCamera);
+	}
 
 //UI
 #ifdef _WITH_DRAW_AXIS
