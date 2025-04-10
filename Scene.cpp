@@ -14,22 +14,22 @@ CScene::~CScene()
 void CScene::BuildObjects()
 {
 
-	CCubeMesh* pCubeMesh = new CCubeMesh(1.0f, 0.4f, 1.0f);
+	CCubeMesh* pCubeMesh = new CCubeMesh(1.0f, 0.4f, 0.1f);
 
 	m_pTitleObjects = new CCubeObject();
 	m_pTitleObjects->SetMesh(pCubeMesh);
 	m_pTitleObjects->SetColor(RGB(255, 0, 0));
-	m_pTitleObjects->SetPosition(0.0f, 0.0f, 0.0f);
+	m_pTitleObjects->SetPosition(0.0f, 0.0f, 1.0f);
 	m_pTitleObjects->UpdateBoundingBox();
 
-	pCubeMesh = new CCubeMesh(0.5f, 0.2f, 1.0f);
+	pCubeMesh = new CCubeMesh(0.5f, 0.2f, 0.1f);
 
 	for (int i = 0; i < m_nCubeObjects; i++)
 	{
 		m_pCubeObjects[i] = new CCubeObject();
 		m_pCubeObjects[i]->SetMesh(pCubeMesh);
 		m_pCubeObjects[i]->SetColor(RGB(255, 0, 0));
-		m_pCubeObjects[i]->SetPosition(-0.5f, -0.5f + 0.3f * i, 0.0f);
+		m_pCubeObjects[i]->SetPosition(-0.8f, -0.58f + 0.35f * i, 1.0f);
 		m_pCubeObjects[i]->UpdateBoundingBox();
 	}
 
@@ -60,10 +60,22 @@ void CScene::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam,
 		int x = LOWORD(lParam);
 		int y = HIWORD(lParam);
 		CCamera* pCamera = m_pPlayer->GetCamera();  //여기서 확보
-		CGameObject* pPickedObject = PickObjectPointedByCursorOrthographic(x, y, pCamera);
+		CGameObject* pPickedObject = PickObjectPointedByCursor(x, y, pCamera);
 
-		if (pPickedObject) {
-			Scene_number = 2;  //클릭된 오브젝트가 있으면 씬 전환
+		switch (Scene_number)
+		{
+		case 0:
+			if (pPickedObject) {
+				Scene_number = 1;
+			}
+			break;
+		case 1:
+			if (pPickedObject) {
+				Scene_number = 2;
+			}
+			break;
+		default:
+			break;
 		}
 		break;
 	
@@ -114,15 +126,27 @@ CGameObject* CScene::PickObjectPointedByCursor(int xClient, int yClient, CCamera
 
 	float fNearestHitDistance = FLT_MAX;
 	CGameObject* pNearestObject = NULL;
-
-	for (int i = 0; i < m_nCubeObjects; i++)
+	switch (Scene_number)
 	{
-		int hit = m_pCubeObjects[i]->PickObjectByRayIntersection(xmvPickPosition, xmmtxView, &fNearestHitDistance);
-		if (hit > 0) {
-			pNearestObject = m_pCubeObjects[i];
+	case 0:
+		if (m_pTitleObjects)
+		{
+			int hit = m_pTitleObjects->PickObjectByRayIntersection(xmvPickPosition, xmmtxView, &fNearestHitDistance);
+			if (hit > 0)
+			{
+				pNearestObject = m_pTitleObjects;
+			}
+		}
+		break;
+	case 1:
+		for (int i = 0; i < m_nCubeObjects; i++)
+		{
+			int hit = m_pCubeObjects[i]->PickObjectByRayIntersection(xmvPickPosition, xmmtxView, &fNearestHitDistance);
+			if (hit > 0) {
+				pNearestObject = m_pCubeObjects[i];
+			}
 		}
 	}
-
 	return(pNearestObject);
 }
 CGameObject* CScene::PickObjectPointedByCursorOrthographic(int xClient, int yClient, CCamera* pCamera)
@@ -142,15 +166,28 @@ CGameObject* CScene::PickObjectPointedByCursorOrthographic(int xClient, int yCli
 
 	float fNearestHitDistance = FLT_MAX;
 	CGameObject* pNearestObject = NULL;
-
-	for (int i = 0; i < m_nCubeObjects; i++)
+	switch (Scene_number)
 	{
-		int hit = m_pCubeObjects[i]->PickObjectByRayIntersection(xmvRayOrigin, XMMatrixIdentity(), &fNearestHitDistance);
-		if (hit > 0) {
-			pNearestObject = m_pCubeObjects[i];
+	case 0:
+		if (m_pTitleObjects)
+		{
+			int hit = m_pTitleObjects->PickObjectByRayIntersection(xmvRayOrigin, XMMatrixIdentity(), &fNearestHitDistance);
+			if (hit > 0)
+			{
+				pNearestObject = m_pTitleObjects;
+			}
 		}
+		break;
+	case 1:
+		for (int i = 0; i < m_nCubeObjects; i++)
+		{
+			int hit = m_pCubeObjects[i]->PickObjectByRayIntersection(xmvRayOrigin, XMMatrixIdentity(), &fNearestHitDistance);
+			if (hit > 0) {
+				pNearestObject = m_pCubeObjects[i];
+			}
+		}
+		break;
 	}
-
 	return pNearestObject;
 }
 
@@ -169,13 +206,14 @@ void CScene::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 	switch (Scene_number)
 	{
 	case 0:
-		CGraphicsPipeline::SetViewOrthographicProjectTransform(&pCamera->m_xmf4x4ViewOrthographicProject);
+		//CGraphicsPipeline::SetViewOrthographicProjectTransform(&pCamera->m_xmf4x4ViewOrthographicProject);
+		CGraphicsPipeline::SetViewPerspectiveProjectTransform(&pCamera->m_xmf4x4ViewPerspectiveProject);
 		m_pTitleObjects->Render(hDCFrameBuffer, pCamera);
 		TextOut(hDCFrameBuffer, 220, 230, _T("3D 게임프로그래밍 1, 이현석"), _tcslen(_T("3D 게임프로그래밍 1, 이현석")));
 		break;
 	case 1:
-		CGraphicsPipeline::SetViewOrthographicProjectTransform(&pCamera->m_xmf4x4ViewOrthographicProject);
-
+		//CGraphicsPipeline::SetViewOrthographicProjectTransform(&pCamera->m_xmf4x4ViewOrthographicProject);
+		CGraphicsPipeline::SetViewPerspectiveProjectTransform(&pCamera->m_xmf4x4ViewPerspectiveProject);
 		for (int i = 0; i < m_nCubeObjects; i++) {
 			m_pCubeObjects[i]->Render(hDCFrameBuffer, pCamera);
 		}

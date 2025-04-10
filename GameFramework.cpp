@@ -77,7 +77,7 @@ void CGameFramework::BuildObjects()
 	m_pPlayer->SetMesh(pAirplaneMesh);
 	m_pPlayer->SetColor(RGB(0, 0, 255));
 	m_pPlayer->SetCamera(pCamera);
-	m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 5.0f, -15.0f));
+	m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 0.0f, -1.0f));
 
 	m_pScene = new CScene(m_pPlayer);
 	m_pScene->BuildObjects();
@@ -197,7 +197,7 @@ void CGameFramework::ProcessInput()
 		SetCursorPos(m_ptOldCursorPos.x, m_ptOldCursorPos.y);
 		if (cxMouseDelta || cyMouseDelta)
 		{
-			if (m_pScene->GetSceneNumber() != 0) {
+			if (m_pScene->GetSceneNumber() > 1) {
 				if (pKeyBuffer[VK_RBUTTON] & 0xF0)
 					m_pPlayer->Rotate(cyMouseDelta, 0.0f, -cxMouseDelta);
 				else
