@@ -78,18 +78,7 @@ void CGameFramework::BuildObjects()
 	m_pPlayer->SetColor(RGB(0, 0, 255));
 	m_pPlayer->SetCamera(pCamera);
 	m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 0.0f, -1.0f));
-
-	switch (Scene_number)
-	{
-	case 0:
-		m_pScene = new CTitleScene(m_pPlayer);
-		break;
-	case 1:
-		m_pScene = new CMenuScene(m_pPlayer);
-		break;
-	default:
-		break;
-	}
+	m_pScene = new CTitleScene(m_pPlayer);
 	m_pScene->BuildObjects();
 }
 
