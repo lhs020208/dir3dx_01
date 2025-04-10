@@ -283,3 +283,5 @@ namespace Plane
 		return(xmf4Result);
 	}
 }
+
+static int Scene_number = 0;

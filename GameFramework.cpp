@@ -79,7 +79,17 @@ void CGameFramework::BuildObjects()
 	m_pPlayer->SetCamera(pCamera);
 	m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 0.0f, -1.0f));
 
-	m_pScene = new CScene(m_pPlayer);
+	switch (Scene_number)
+	{
+	case 0:
+		m_pScene = new CTitleScene(m_pPlayer);
+		break;
+	case 1:
+		m_pScene = new CMenuScene(m_pPlayer);
+		break;
+	default:
+		break;
+	}
 	m_pScene->BuildObjects();
 }
 
@@ -197,7 +207,7 @@ void CGameFramework::ProcessInput()
 		SetCursorPos(m_ptOldCursorPos.x, m_ptOldCursorPos.y);
 		if (cxMouseDelta || cyMouseDelta)
 		{
-			if (m_pScene->GetSceneNumber() > 1) {
+			if (Scene_number > 1) {
 				if (pKeyBuffer[VK_RBUTTON] & 0xF0)
 					m_pPlayer->Rotate(cyMouseDelta, 0.0f, -cxMouseDelta);
 				else
@@ -236,3 +246,27 @@ void CGameFramework::FrameAdvance()
 }
 
 
+void CGameFramework::ChangeScene(int newSceneNumber)
+{
+	if (m_pScene) {
+		m_pScene->ReleaseObjects();
+		delete m_pScene;
+		m_pScene = nullptr;
+	}
+
+	Scene_number = newSceneNumber;
+
+	switch (Scene_number) {
+	case 0:
+		m_pScene = new CTitleScene(m_pPlayer);
+		break;
+	case 1:
+		m_pScene = new CMenuScene(m_pPlayer);
+		break;
+	default:
+		m_pScene = new CScene(m_pPlayer);  // fallback
+		break;
+	}
+
+	m_pScene->BuildObjects();
+}

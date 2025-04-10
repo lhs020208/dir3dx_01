@@ -51,5 +51,6 @@ public:
 	LRESULT CALLBACK OnProcessingWindowMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam);
 
 	void SetActive(bool bActive) { m_bActive = bActive; }
+	void ChangeScene(int newSceneNumber);
 };
 
