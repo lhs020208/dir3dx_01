@@ -30,11 +30,12 @@ public:
 	virtual void BuildObjects() override;
 	virtual void ReleaseObjects() override;
 	virtual void Render(HDC hDCFrameBuffer, CCamera* pCamera) override;
+	virtual void Animate(float fElapsedTime) override;
 	CGameObject* PickObjectPointedByCursor(int xClient, int yClient, CCamera* pCamera);
 
 	virtual void OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam) override;
 private:
-	CCubeObject* m_pTitleObjects;
+	CTitleObject* m_pTitleObjects;
 };
 
 class CMenuScene : public CScene {

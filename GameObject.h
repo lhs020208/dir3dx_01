@@ -91,6 +91,9 @@ public:
 
 	virtual void Animate(float fElapsedTime) override;
 	virtual void Render(HDC hDCFrameBuffer, CCamera* pCamera) override;
+
+	void Rotate(float fPitch = 0.0f, float fYaw = 10.0f, float fRoll = 0.0f);
+	void Rotate(XMFLOAT3& xmf3Axis, float fAngle);
 };
 
 class CAxisObject : public CGameObject

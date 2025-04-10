@@ -229,10 +229,23 @@ CTitleObject::~CTitleObject()
 
 void CTitleObject::Animate(float fElapsedTime)
 {
-	CTitleObject::Animate(fElapsedTime);
+	Rotate(-90.0f * fElapsedTime, 0.0f * fElapsedTime, 0.0f * fElapsedTime);
+	UpdateBoundingBox();
 }
 
 void CTitleObject::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 {
-	CTitleObject::Render(hDCFrameBuffer, pCamera);
+	CGameObject::Render(hDCFrameBuffer, pCamera);
+}
+
+void CTitleObject::Rotate(float fPitch, float fYaw, float fRoll)
+{
+	XMFLOAT4X4 mtxRotate = Matrix4x4::RotationYawPitchRoll(fPitch, fYaw, fRoll);
+	m_xmf4x4World = Matrix4x4::Multiply(mtxRotate, m_xmf4x4World);
+}
+
+void CTitleObject::Rotate(XMFLOAT3& xmf3RotationAxis, float fAngle)
+{
+	XMFLOAT4X4 mtxRotate = Matrix4x4::RotationAxis(xmf3RotationAxis, fAngle);
+	m_xmf4x4World = Matrix4x4::Multiply(mtxRotate, m_xmf4x4World);
 }
