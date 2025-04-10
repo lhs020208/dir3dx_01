@@ -54,7 +54,7 @@ void CScene::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam,
 		CGameObject* pPickedObject = PickObjectPointedByCursorOrthographic(x, y, pCamera);
 
 		if (pPickedObject) {
-			Scene_number = 1;  //클릭된 오브젝트가 있으면 씬 전환
+			Scene_number = 2;  //클릭된 오브젝트가 있으면 씬 전환
 
 		}
 		break;
@@ -162,9 +162,14 @@ void CScene::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 
 	CGraphicsPipeline::SetViewport(&pCamera->m_Viewport);
 
-	if (Scene_number == 0) { // 메인메뉴
+	switch (Scene_number)
+	{
+	case 0:
 		CGraphicsPipeline::SetViewOrthographicProjectTransform(&pCamera->m_xmf4x4ViewOrthographicProject);
-		
+		break;
+	case 1:
+		CGraphicsPipeline::SetViewOrthographicProjectTransform(&pCamera->m_xmf4x4ViewOrthographicProject);
+
 		for (int i = 0; i < m_nCubeObjects; i++) {
 			m_pCubeObjects[i]->Render(hDCFrameBuffer, pCamera);
 		}
@@ -173,10 +178,11 @@ void CScene::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 		TextOut(hDCFrameBuffer, 135, 210, _T("Level-2"), _tcslen(_T("Level-2")));
 		TextOut(hDCFrameBuffer, 140, 280, _T("Start"), _tcslen(_T("Start")));
 		TextOut(hDCFrameBuffer, 140, 350, _T("End"), _tcslen(_T("End")));
-	}
-	else { // 그 외
+		break;
+	default:
 		CGraphicsPipeline::SetViewPerspectiveProjectTransform(&pCamera->m_xmf4x4ViewPerspectiveProject);
 		if (m_pPlayer) m_pPlayer->Render(hDCFrameBuffer, pCamera);
+		break;
 	}
 
 //UI

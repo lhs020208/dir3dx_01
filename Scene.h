@@ -11,7 +11,7 @@ public:
 	virtual ~CScene();
 	int GetSceneNumber() const { return Scene_number; }
 private:
-	int							Scene_number = 0;
+	int							Scene_number = 1;
 
 	static const int			m_nCubeObjects = 5;
 	CCubeObject*				m_pCubeObjects[m_nCubeObjects];
