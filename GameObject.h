@@ -83,6 +83,15 @@ public:
 	virtual void Render(HDC hDCFrameBuffer, CCamera* pCamera) override;
 };
 
+class CTitleObject : public CGameObject
+{
+public:
+	CTitleObject();
+	virtual ~CTitleObject();
+
+	virtual void Animate(float fElapsedTime) override;
+	virtual void Render(HDC hDCFrameBuffer, CCamera* pCamera) override;
+};
 
 class CAxisObject : public CGameObject
 {

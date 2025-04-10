@@ -14,7 +14,15 @@ CScene::~CScene()
 void CScene::BuildObjects()
 {
 
-	CCubeMesh* pCubeMesh = new CCubeMesh(0.5f, 0.2f, 1.0f); // 정육면체 크기
+	CCubeMesh* pCubeMesh = new CCubeMesh(1.0f, 0.4f, 1.0f);
+
+	m_pTitleObjects = new CCubeObject();
+	m_pTitleObjects->SetMesh(pCubeMesh);
+	m_pTitleObjects->SetColor(RGB(255, 0, 0));
+	m_pTitleObjects->SetPosition(0.0f, 0.0f, 0.0f);
+	m_pTitleObjects->UpdateBoundingBox();
+
+	pCubeMesh = new CCubeMesh(0.5f, 0.2f, 1.0f);
 
 	for (int i = 0; i < m_nCubeObjects; i++)
 	{
@@ -34,6 +42,7 @@ void CScene::BuildObjects()
 
 void CScene::ReleaseObjects()
 {
+	if (m_pTitleObjects) delete m_pTitleObjects;
 	for (int i = 0; i < m_nCubeObjects; i++) {
 		if (m_pCubeObjects[i]) delete m_pCubeObjects[i];
 	}
@@ -55,7 +64,6 @@ void CScene::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam,
 
 		if (pPickedObject) {
 			Scene_number = 2;  //클릭된 오브젝트가 있으면 씬 전환
-
 		}
 		break;
 	
@@ -119,19 +127,15 @@ CGameObject* CScene::PickObjectPointedByCursor(int xClient, int yClient, CCamera
 }
 CGameObject* CScene::PickObjectPointedByCursorOrthographic(int xClient, int yClient, CCamera* pCamera)
 {
-	// 직교 투영 뷰 영역 크기
 	float viewWidth = (float)pCamera->m_Viewport.m_nWidth;
 	float viewHeight = (float)pCamera->m_Viewport.m_nHeight;
 
-	// NDC(-1~1) 기준으로 변환
 	float px = ((2.0f * xClient) / viewWidth - 1.0f);
 	float py = (1.0f - (2.0f * yClient) / viewHeight);
 
-	// 월드 공간에서 픽 레이 원점 및 방향 계산
 	XMFLOAT3 xmf3RayOrigin = XMFLOAT3(px * viewWidth * 0.5f, py * viewHeight * 0.5f, 0.0f);
-	XMFLOAT3 xmf3RayDirection = XMFLOAT3(0.0f, 0.0f, 1.0f); // 직교 투영은 항상 Z+
+	XMFLOAT3 xmf3RayDirection = XMFLOAT3(0.0f, 0.0f, 1.0f);
 
-	// 뷰 공간 → 월드 공간 변환
 	XMVECTOR xmvRayOrigin = XMVector3TransformCoord(XMLoadFloat3(&xmf3RayOrigin), XMLoadFloat4x4(&pCamera->m_xmf4x4View));
 	XMVECTOR xmvRayDirection = XMVector3TransformNormal(XMLoadFloat3(&xmf3RayDirection), XMLoadFloat4x4(&pCamera->m_xmf4x4View));
 	xmvRayDirection = XMVector3Normalize(xmvRayDirection);
@@ -166,6 +170,8 @@ void CScene::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 	{
 	case 0:
 		CGraphicsPipeline::SetViewOrthographicProjectTransform(&pCamera->m_xmf4x4ViewOrthographicProject);
+		m_pTitleObjects->Render(hDCFrameBuffer, pCamera);
+		TextOut(hDCFrameBuffer, 220, 230, _T("3D 게임프로그래밍 1, 이현석"), _tcslen(_T("3D 게임프로그래밍 1, 이현석")));
 		break;
 	case 1:
 		CGraphicsPipeline::SetViewOrthographicProjectTransform(&pCamera->m_xmf4x4ViewOrthographicProject);

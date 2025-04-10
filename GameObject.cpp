@@ -218,4 +218,21 @@ void CAxisObject::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 
 	m_pMesh->Render(hDCFrameBuffer);
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+CTitleObject::CTitleObject()
+{
+}
 
+CTitleObject::~CTitleObject()
+{
+}
+
+void CTitleObject::Animate(float fElapsedTime)
+{
+	CTitleObject::Animate(fElapsedTime);
+}
+
+void CTitleObject::Render(HDC hDCFrameBuffer, CCamera* pCamera)
+{
+	CTitleObject::Render(hDCFrameBuffer, pCamera);
+}
