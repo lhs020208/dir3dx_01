@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "GameObject.h"
 #include "GraphicsPipeline.h"
+#include "GameFramework.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -197,21 +198,32 @@ int CGameObject::PickObjectByRayIntersection(XMVECTOR& xmvPickPosition, XMMATRIX
 CCubeObject::CCubeObject()
 {
 }
-
 CCubeObject::~CCubeObject()
 {
 }
-
 void CCubeObject::Animate(float fElapsedTime)
 {
 }
-
 void CCubeObject::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 {
 	CGameObject::Render(hDCFrameBuffer, pCamera);
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
+CMenuObject::CMenuObject()
+{
+}
+CMenuObject::~CMenuObject()
+{
+}
+void CMenuObject::Animate(float fElapsedTime)
+{
+}
+void CMenuObject::Render(HDC hDCFrameBuffer, CCamera* pCamera)
+{
+	CGameObject::Render(hDCFrameBuffer, pCamera);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 void CAxisObject::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 {
 	CGraphicsPipeline::SetWorldTransform(&m_xmf4x4World);
@@ -229,13 +241,50 @@ CTitleObject::~CTitleObject()
 
 void CTitleObject::Animate(float fElapsedTime)
 {
-	Rotate(-90.0f * fElapsedTime, 0.0f * fElapsedTime, 0.0f * fElapsedTime);
-	UpdateBoundingBox();
+	extern CGameFramework* g_pFramework;
+
+	if (m_bBlowingUp)
+	{
+		m_fElapsedTimes += fElapsedTime;
+		if (m_fElapsedTimes >= m_fDuration)
+		{
+			m_bBlowingUp = false;
+			return;
+		}
+
+		for (int i = 0; i < EXPLOSION_DEBRISES; i++) {
+			XMFLOAT3 direction = m_pxmf3SphereVectors[i];
+			XMFLOAT3 position = Vector3::Add(GetPosition(), Vector3::ScalarProduct(direction, m_fElapsedTimes * m_fExplosionSpeed));
+			XMFLOAT4X4 world = Matrix4x4::RotationAxis(direction, m_fElapsedTimes * XMConvertToRadians(m_fExplosionRotation));
+			world._41 = position.x; world._42 = position.y; world._43 = position.z;
+			m_pxmf4x4Transforms[i] = world;
+		}
+	}
+	else
+	{
+		Rotate(0.0f * fElapsedTime, 10.0f * fElapsedTime, 0.0f * fElapsedTime);
+		UpdateBoundingBox();
+	}
+	if (m_bPrevBlowingUp && !m_bBlowingUp) {
+		if (g_pFramework) g_pFramework->ChangeScene(1);
+	}
+	m_bPrevBlowingUp = m_bBlowingUp;
 }
 
 void CTitleObject::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 {
-	CGameObject::Render(hDCFrameBuffer, pCamera);
+	if (m_bBlowingUp)
+	{
+		for (int i = 0; i < EXPLOSION_DEBRISES; i++) {
+			if (pCamera->IsInFrustum(m_xmOOBB)) {
+				CGameObject::Render(hDCFrameBuffer, &m_pxmf4x4Transforms[i], m_pExplosionMesh);
+			}
+		}
+	}
+	else
+	{
+		CGameObject::Render(hDCFrameBuffer, pCamera);
+	}
 }
 
 void CTitleObject::Rotate(float fPitch, float fYaw, float fRoll)
@@ -248,4 +297,17 @@ void CTitleObject::Rotate(XMFLOAT3& xmf3RotationAxis, float fAngle)
 {
 	XMFLOAT4X4 mtxRotate = Matrix4x4::RotationAxis(xmf3RotationAxis, fAngle);
 	m_xmf4x4World = Matrix4x4::Multiply(mtxRotate, m_xmf4x4World);
+}
+
+CMesh* CTitleObject::m_pExplosionMesh = NULL;
+void CTitleObject::PrepareExplosion()
+{
+	m_bBlowingUp = true;
+	m_fElapsedTimes = 0.0f;
+
+	if (!m_pExplosionMesh) m_pExplosionMesh = new CCubeMesh(0.05f, 0.05f, 0.05f);
+
+	for (int i = 0; i < EXPLOSION_DEBRISES; i++) {
+		XMStoreFloat3(&m_pxmf3SphereVectors[i], RandomUnitVectorOnSphere());
+	}
 }

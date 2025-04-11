@@ -31,6 +31,7 @@ class CMesh
 {
 public:
 	CMesh() { }
+	CMesh(const char* filename);
 	CMesh(int nPolygons);
 	virtual ~CMesh();
 
@@ -78,4 +79,46 @@ public:
 	virtual ~CAxisMesh() { }
 
 	virtual void Render(HDC hDCFrameBuffer);
+};
+
+class CTitleMesh : public CMesh
+{
+public:
+	CTitleMesh(const char* filename);
+	virtual ~CTitleMesh() {}
+};
+
+class CTutorialMesh : public CMesh
+{
+public:
+	CTutorialMesh(const char* filename);
+	virtual ~CTutorialMesh() {}
+};
+
+class CLevel_1Mesh : public CMesh
+{
+public:
+	CLevel_1Mesh(const char* filename);
+	virtual ~CLevel_1Mesh() {}
+};
+
+class CLevel_2Mesh : public CMesh
+{
+public:
+	CLevel_2Mesh(const char* filename);
+	virtual ~CLevel_2Mesh() {}
+};
+
+class CStartMesh : public CMesh
+{
+public:
+	CStartMesh(const char* filename);
+	virtual ~CStartMesh() {}
+};
+
+class CEndMesh : public CMesh
+{
+public:
+	CEndMesh(const char* filename);
+	virtual ~CEndMesh() {}
 };

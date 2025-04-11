@@ -1,3 +1,8 @@
+#include <fstream>
+#include <sstream>
+#include <string>
+#include <vector>
+
 #include "stdafx.h"
 #include "Mesh.h"
 #include "GraphicsPipeline.h"
@@ -24,7 +29,6 @@ void CPolygon::SetVertex(int nIndex, CVertex& vertex)
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////
-//
 CMesh::CMesh(int nPolygons)
 {
 	m_nPolygons = nPolygons;
@@ -278,3 +282,65 @@ void CAxisMesh::Render(HDC hDCFrameBuffer)
 	::SelectObject(hDCFrameBuffer, hOldPen);
 	::DeleteObject(hPen);
 }
+
+struct Face3 {
+	int i[3];
+};
+
+CMesh::CMesh(const char* filename)
+{
+	std::ifstream file(filename);
+	if (!file.is_open()) return;
+
+	std::vector<XMFLOAT3> vertices;
+	std::vector<Face3> faces;
+
+	std::string line;
+	while (std::getline(file, line)) {
+		std::istringstream iss(line);
+		std::string prefix;
+		iss >> prefix;
+
+		if (prefix == "v") {
+			float x, y, z;
+			iss >> x >> y >> z;
+			vertices.emplace_back(x, y, z);
+		}
+		else if (prefix == "f") {
+			Face3 face;
+			for (int i = 0; i < 3; ++i) {
+				std::string token;
+				iss >> token;
+				std::istringstream tokenStream(token);
+				std::string vIdx;
+				std::getline(tokenStream, vIdx, '/');
+				face.i[i] = std::stoi(vIdx) - 1;
+			}
+			faces.push_back(face);
+		}
+	}
+
+	file.close();
+
+	m_nPolygons = static_cast<int>(faces.size());
+	m_ppPolygons = new CPolygon * [m_nPolygons];
+
+	for (int i = 0; i < m_nPolygons; ++i) {
+		CPolygon* poly = new CPolygon(3);
+		for (int j = 0; j < 3; ++j) {
+			int vi = faces[i].i[j];
+			const XMFLOAT3& pos = vertices[vi];
+			poly->SetVertex(j, CVertex(pos.x, pos.y, pos.z));
+		}
+		SetPolygon(i, poly);
+	}
+
+	m_xmOOBB = BoundingOrientedBox(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), XMFLOAT4(0, 0, 0, 1));
+}
+
+CTitleMesh::CTitleMesh(const char* filename) : CMesh(filename) {}
+CTutorialMesh::CTutorialMesh(const char* filename) : CMesh(filename) {}
+CLevel_1Mesh::CLevel_1Mesh(const char* filename) : CMesh(filename) {}
+CLevel_2Mesh::CLevel_2Mesh(const char* filename) : CMesh(filename) {}
+CStartMesh::CStartMesh(const char* filename) : CMesh(filename) {}
+CEndMesh::CEndMesh(const char* filename) : CMesh(filename) {}

@@ -94,6 +94,31 @@ public:
 
 	void Rotate(float fPitch = 0.0f, float fYaw = 10.0f, float fRoll = 0.0f);
 	void Rotate(XMFLOAT3& xmf3Axis, float fAngle);
+	void PrepareExplosion();
+	bool IsBlowingUp() { return m_bBlowingUp; }
+
+private:
+	bool m_bBlowingUp = false;
+	bool m_bPrevBlowingUp = false;
+	float m_fElapsedTimes = 0.0f;
+	float m_fDuration = 2.0f;
+	float m_fExplosionSpeed = 10.0f;
+	float m_fExplosionRotation = 360.0f;
+
+	XMFLOAT4X4 m_pxmf4x4Transforms[EXPLOSION_DEBRISES];
+	XMFLOAT3 m_pxmf3SphereVectors[EXPLOSION_DEBRISES];
+
+	static CMesh* m_pExplosionMesh;
+};
+
+class CMenuObject : public CGameObject
+{
+public:
+	CMenuObject();
+	virtual ~CMenuObject();
+
+	virtual void Animate(float fElapsedTime) override;
+	virtual void Render(HDC hDCFrameBuffer, CCamera* pCamera) override;
 };
 
 class CAxisObject : public CGameObject

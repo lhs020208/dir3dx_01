@@ -49,7 +49,7 @@ public:
 	virtual void OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam) override;
 private:
 	static const int m_nCubeObjects = 5;
-	CCubeObject* m_pCubeObjects[m_nCubeObjects];
+	CMenuObject* m_pCubeObjects[m_nCubeObjects];
 };
 
 class CRollerCoasterScene : public CScene {

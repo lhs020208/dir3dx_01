@@ -67,10 +67,10 @@ void CScene::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 //타이틀 Scene////////////////////////////////////////////////////////////////////////////////////////////////
 CTitleScene::CTitleScene(CPlayer* pPlayer) : CScene(pPlayer) {}
 void CTitleScene::BuildObjects() {
-	CCubeMesh* pCubeMesh = new CCubeMesh(1.0f, 0.4f, 0.1f);
+	CTitleMesh* cTitleMesh = new CTitleMesh("Title.obj");
 
 	m_pTitleObjects = new CTitleObject();
-	m_pTitleObjects->SetMesh(pCubeMesh);
+	m_pTitleObjects->SetMesh(cTitleMesh);
 	m_pTitleObjects->SetColor(RGB(255, 0, 0));
 	m_pTitleObjects->SetPosition(0.0f, 0.0f, 1.0f);
 	m_pTitleObjects->UpdateBoundingBox();
@@ -84,12 +84,9 @@ void CTitleScene::Render(HDC hDCFrameBuffer, CCamera* pCamera) {
 	CGraphicsPipeline::SetViewPerspectiveProjectTransform(&pCamera->m_xmf4x4ViewPerspectiveProject);
 
 	if (m_pTitleObjects) m_pTitleObjects->Render(hDCFrameBuffer, pCamera);
-
-	TextOut(hDCFrameBuffer, 220, 230, _T("3D 게임프로그래밍 1, "), _tcslen(_T("3D 게임프로그래밍 1, ")));
 }
 void CTitleScene::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 {
-	extern CGameFramework* g_pFramework;
 	switch (nMessageID)
 	{
 	case WM_LBUTTONDOWN:
@@ -99,8 +96,9 @@ void CTitleScene::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wP
 		CGameObject* pPickedObject = PickObjectPointedByCursor(x, y, pCamera);
 
 		if (pPickedObject) {
-			g_pFramework->ChangeScene(1);
-			OutputDebugString(L"디버그 메시지 출력\n");
+			if (!m_pTitleObjects->IsBlowingUp()) {
+				m_pTitleObjects->PrepareExplosion();
+			}
 		}
 
 	}
@@ -135,13 +133,43 @@ CGameObject* CTitleScene::PickObjectPointedByCursor(int xClient, int yClient, CC
 //메뉴 Scene////////////////////////////////////////////////////////////////////////////////////////////////
 CMenuScene::CMenuScene(CPlayer* pPlayer) : CScene(pPlayer) {}
 void CMenuScene::BuildObjects() {
-	CCubeMesh* pCubeMesh = new CCubeMesh(0.5f, 0.2f, 0.1f);
-
 	for (int i = 0; i < m_nCubeObjects; i++)
 	{
-		m_pCubeObjects[i] = new CCubeObject();
-		m_pCubeObjects[i]->SetMesh(pCubeMesh);
-		m_pCubeObjects[i]->SetColor(RGB(255, 0, 0));
+		m_pCubeObjects[i] = new CMenuObject();
+		switch (i)
+		{
+		case 4:
+		{
+			CTutorialMesh* pCubeMesh = new CTutorialMesh("Tutorial.obj");
+			m_pCubeObjects[i]->SetMesh(pCubeMesh);
+			break;
+		}
+		case 3:
+		{
+			CLevel_1Mesh * pCubeMesh = new CLevel_1Mesh("Level-1.obj");
+			m_pCubeObjects[i]->SetMesh(pCubeMesh);
+			break;
+		}
+		case 2:
+		{
+			CLevel_2Mesh * pCubeMesh = new CLevel_2Mesh("Level-2.obj");
+			m_pCubeObjects[i]->SetMesh(pCubeMesh);
+			break;
+		}
+		case 1:
+		{
+			CStartMesh * pCubeMesh = new CStartMesh("Start.obj");
+			m_pCubeObjects[i]->SetMesh(pCubeMesh);
+			break;
+		}
+		case 0:
+		{
+			CEndMesh * pCubeMesh = new CEndMesh("End.obj");
+			m_pCubeObjects[i]->SetMesh(pCubeMesh);
+			break;
+		}
+		}
+		m_pCubeObjects[i]->SetColor(RGB(0, 0, 0));
 		m_pCubeObjects[i]->SetPosition(-0.8f, -0.58f + 0.35f * i, 1.0f);
 		m_pCubeObjects[i]->UpdateBoundingBox();
 	}
@@ -160,11 +188,6 @@ void CMenuScene::Render(HDC hDCFrameBuffer, CCamera* pCamera) {
 		for (int i = 0; i < m_nCubeObjects; i++) {
 			m_pCubeObjects[i]->Render(hDCFrameBuffer, pCamera);
 		}
-		TextOut(hDCFrameBuffer, 135, 60, _T("Tutorial"), _tcslen(_T("Tutorial")));
-		TextOut(hDCFrameBuffer, 135, 135, _T("Level-1"), _tcslen(_T("Level-1")));
-		TextOut(hDCFrameBuffer, 135, 210, _T("Level-2"), _tcslen(_T("Level-2")));
-		TextOut(hDCFrameBuffer, 140, 280, _T("Start"), _tcslen(_T("Start")));
-		TextOut(hDCFrameBuffer, 140, 350, _T("End"), _tcslen(_T("End")));
 }
 void CMenuScene::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 {
