@@ -60,7 +60,7 @@ public:
 	virtual void Render(HDC hDCFrameBuffer, CCamera* pCamera) override;
 	//CGameObject* PickObjectPointedByCursor(int xClient, int yClient, CCamera* pCamera);
 
-	//virtual void OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam) override;
+	virtual void OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam) override;
 private:
 	//static const int m_nCubeObjects = 5;
 	//CCubeObject* m_pCubeObjects[m_nCubeObjects];

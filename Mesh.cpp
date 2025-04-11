@@ -66,6 +66,7 @@ void CMesh::Render(HDC hDCFrameBuffer)
 	{
 		int nVertices = m_ppPolygons[j]->m_nVertices;
 		CVertex* pVertices = m_ppPolygons[j]->m_pVertices;
+		if (!pVertices) continue;
 
 		f3PreviousProject = f3InitialProject = CGraphicsPipeline::Project(pVertices[0].m_xmf3Position);
 		bPreviousInside = bInitialInside = (-1.0f <= f3InitialProject.x) && (f3InitialProject.x <= 1.0f) && (-1.0f <= f3InitialProject.y) && (f3InitialProject.y <= 1.0f);

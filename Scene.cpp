@@ -200,9 +200,38 @@ void CMenuScene::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wPa
 		CCamera* pCamera = m_pPlayer->GetCamera();  //여기서 확보
 		CGameObject* pPickedObject = PickObjectPointedByCursor(x, y, pCamera);
 
-		if (pPickedObject) {
-			g_pFramework->ChangeScene(2);
-			OutputDebugString(L"디버그 메시지 출력\n");
+		if (pPickedObject)
+		{
+			for (int i = 0; i < m_nCubeObjects; i++)
+			{
+				if (pPickedObject == m_pCubeObjects[i])
+				{
+					// 인덱스별로 분기
+					switch (i)
+					{
+					case 0:
+						OutputDebugString(L"Cube 0 클릭됨\n"); // End
+						SendMessage(hWnd, WM_CLOSE, 0, 0);
+						break;
+					case 1:
+						OutputDebugString(L"Cube 1 클릭됨\n"); //Start
+						g_pFramework->ChangeScene(2);
+						break;
+					case 2:
+						OutputDebugString(L"Cube 2 클릭됨\n"); //L2
+						g_pFramework->ChangeScene(3);
+						break;
+					case 3:
+						OutputDebugString(L"Cube 3 클릭됨\n"); //L1
+						g_pFramework->ChangeScene(2);
+						break;
+					case 4:
+						OutputDebugString(L"Cube 4 클릭됨\n"); //Tutorial
+						break;
+					}
+					break;
+				}
+			}
 		}
 
 	}
@@ -243,4 +272,28 @@ void CRollerCoasterScene::Render(HDC hDCFrameBuffer, CCamera* pCamera) {
 
 	CGraphicsPipeline::SetViewPerspectiveProjectTransform(&pCamera->m_xmf4x4ViewPerspectiveProject);
 	if (m_pPlayer) m_pPlayer->Render(hDCFrameBuffer, pCamera);
+}
+
+void CRollerCoasterScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
+{
+	extern CGameFramework* g_pFramework;
+	switch (nMessageID)
+	{
+	case WM_KEYDOWN:
+		switch (wParam)
+		{
+		case 'n':
+		case 'N':
+			g_pFramework->ChangeScene(3);
+			break;
+		case VK_ESCAPE:
+			g_pFramework->ChangeScene(1);
+			break;
+		default:
+			break;
+		}
+		break;
+	default:
+		break;
+	}
 }

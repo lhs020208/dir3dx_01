@@ -124,13 +124,6 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 	case WM_KEYDOWN:
 		switch (wParam)
 		{
-		case VK_ESCAPE:
-			::PostQuitMessage(0);
-			break;
-		case VK_RETURN:
-			break;
-		case VK_CONTROL:
-			break;
 		default:
 			m_pScene->OnProcessingKeyboardMessage(hWnd, nMessageID, wParam, lParam);
 			break;
@@ -248,9 +241,11 @@ void CGameFramework::ChangeScene(int newSceneNumber)
 	switch (Scene_number) {
 	case 0:
 		m_pScene = new CTitleScene(m_pPlayer);
+		m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 0.0f, -1.0f));
 		break;
 	case 1:
 		m_pScene = new CMenuScene(m_pPlayer);
+		m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 0.0f, -1.0f));
 		break;
 	case 2:
 		m_pScene = new CRollerCoasterScene(m_pPlayer);
