@@ -252,8 +252,12 @@ void CGameFramework::ChangeScene(int newSceneNumber)
 	case 1:
 		m_pScene = new CMenuScene(m_pPlayer);
 		break;
+	case 2:
+		m_pScene = new CRollerCoasterScene(m_pPlayer);
+		m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 1.0f, -3.0f));
+		break;
 	default:
-		m_pScene = new CScene(m_pPlayer);  // fallback
+		m_pScene = new CScene(m_pPlayer);
 		break;
 	}
 

@@ -64,7 +64,7 @@ void CScene::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 		CGraphicsPipeline::SetViewPerspectiveProjectTransform(&pCamera->m_xmf4x4ViewPerspectiveProject);
 		if (m_pPlayer) m_pPlayer->Render(hDCFrameBuffer, pCamera);
 }
-
+//타이틀 Scene////////////////////////////////////////////////////////////////////////////////////////////////
 CTitleScene::CTitleScene(CPlayer* pPlayer) : CScene(pPlayer) {}
 void CTitleScene::BuildObjects() {
 	CCubeMesh* pCubeMesh = new CCubeMesh(1.0f, 0.4f, 0.1f);
@@ -132,7 +132,7 @@ CGameObject* CTitleScene::PickObjectPointedByCursor(int xClient, int yClient, CC
 	}
 	return(pNearestObject);
 }
-
+//메뉴 Scene////////////////////////////////////////////////////////////////////////////////////////////////
 CMenuScene::CMenuScene(CPlayer* pPlayer) : CScene(pPlayer) {}
 void CMenuScene::BuildObjects() {
 	CCubeMesh* pCubeMesh = new CCubeMesh(0.5f, 0.2f, 0.1f);
@@ -205,4 +205,19 @@ CGameObject* CMenuScene::PickObjectPointedByCursor(int xClient, int yClient, CCa
 		}
 	}
 	return(pNearestObject);
+}
+//롤러코스터 Scene////////////////////////////////////////////////////////////////////////////////////////////////
+CRollerCoasterScene::CRollerCoasterScene(CPlayer* pPlayer) : CScene(pPlayer) {}
+void CRollerCoasterScene::BuildObjects() {
+	
+}
+void CRollerCoasterScene::ReleaseObjects()
+{
+	
+}
+void CRollerCoasterScene::Render(HDC hDCFrameBuffer, CCamera* pCamera) {
+	CGraphicsPipeline::SetViewport(&pCamera->m_Viewport);
+
+	CGraphicsPipeline::SetViewPerspectiveProjectTransform(&pCamera->m_xmf4x4ViewPerspectiveProject);
+	if (m_pPlayer) m_pPlayer->Render(hDCFrameBuffer, pCamera);
 }
