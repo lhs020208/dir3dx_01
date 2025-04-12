@@ -121,6 +121,18 @@ public:
 	virtual void Render(HDC hDCFrameBuffer, CCamera* pCamera) override;
 };
 
+
+class CRollerCoasterObject : public CGameObject
+{
+public:
+	CRollerCoasterObject();
+	virtual ~CRollerCoasterObject();
+
+	virtual void Animate(float fElapsedTime) override;
+	virtual void Render(HDC hDCFrameBuffer, CCamera* pCamera) override;
+};
+
+
 class CAxisObject : public CGameObject
 {
 public:

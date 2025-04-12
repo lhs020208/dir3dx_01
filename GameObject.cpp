@@ -224,6 +224,21 @@ void CMenuObject::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 	CGameObject::Render(hDCFrameBuffer, pCamera);
 }
 /////////////////////////////////////////////////////////////////////////////////////////////////////
+
+CRollerCoasterObject::CRollerCoasterObject()
+{
+}
+CRollerCoasterObject::~CRollerCoasterObject()
+{
+}
+void CRollerCoasterObject::Animate(float fElapsedTime)
+{
+}
+void CRollerCoasterObject::Render(HDC hDCFrameBuffer, CCamera* pCamera)
+{
+	CGameObject::Render(hDCFrameBuffer, pCamera);
+}
+/////////////////////////////////////////////////////////////////////////////////////////////////////
 void CAxisObject::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 {
 	CGraphicsPipeline::SetWorldTransform(&m_xmf4x4World);
@@ -242,9 +257,14 @@ CTitleObject::~CTitleObject()
 void CTitleObject::Animate(float fElapsedTime)
 {
 	extern CGameFramework* g_pFramework;
-
+	static bool bSceneChanged = false;
 	if (m_bBlowingUp)
 	{
+		if (!bSceneChanged && m_fElapsedTimes >= (m_fDuration - 0.3f)) {
+			bSceneChanged = true;
+			if (g_pFramework) g_pFramework->ChangeScene(1);
+		}
+
 		m_fElapsedTimes += fElapsedTime;
 		if (m_fElapsedTimes >= m_fDuration)
 		{
@@ -265,10 +285,6 @@ void CTitleObject::Animate(float fElapsedTime)
 		Rotate(0.0f * fElapsedTime, 10.0f * fElapsedTime, 0.0f * fElapsedTime);
 		UpdateBoundingBox();
 	}
-	if (m_bPrevBlowingUp && !m_bBlowingUp) {
-		if (g_pFramework) g_pFramework->ChangeScene(1);
-	}
-	m_bPrevBlowingUp = m_bBlowingUp;
 }
 
 void CTitleObject::Render(HDC hDCFrameBuffer, CCamera* pCamera)

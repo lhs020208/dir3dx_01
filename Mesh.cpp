@@ -64,21 +64,22 @@ void CMesh::Render(HDC hDCFrameBuffer)
 
 	for (int j = 0; j < m_nPolygons; j++)
 	{
-		int nVertices = m_ppPolygons[j]->m_nVertices;
-		CVertex* pVertices = m_ppPolygons[j]->m_pVertices;
-		if (!pVertices) continue;
+		if (m_ppPolygons[j]->m_nVertices && m_ppPolygons[j]->m_pVertices) {
+			int nVertices = m_ppPolygons[j]->m_nVertices;
+			CVertex* pVertices = m_ppPolygons[j]->m_pVertices;
 
-		f3PreviousProject = f3InitialProject = CGraphicsPipeline::Project(pVertices[0].m_xmf3Position);
-		bPreviousInside = bInitialInside = (-1.0f <= f3InitialProject.x) && (f3InitialProject.x <= 1.0f) && (-1.0f <= f3InitialProject.y) && (f3InitialProject.y <= 1.0f);
-		for (int i = 1; i < nVertices; i++)
-		{
-			XMFLOAT3 f3CurrentProject = CGraphicsPipeline::Project(pVertices[i].m_xmf3Position);
-			bCurrentInside = (-1.0f <= f3CurrentProject.x) && (f3CurrentProject.x <= 1.0f) && (-1.0f <= f3CurrentProject.y) && (f3CurrentProject.y <= 1.0f);
-			if (((0.0f <= f3CurrentProject.z) && (f3CurrentProject.z <= 1.0f)) && ((bCurrentInside || bPreviousInside))) ::Draw2DLine(hDCFrameBuffer, f3PreviousProject, f3CurrentProject);
-			f3PreviousProject = f3CurrentProject;
-			bPreviousInside = bCurrentInside;
+			f3PreviousProject = f3InitialProject = CGraphicsPipeline::Project(pVertices[0].m_xmf3Position);
+			bPreviousInside = bInitialInside = (-1.0f <= f3InitialProject.x) && (f3InitialProject.x <= 1.0f) && (-1.0f <= f3InitialProject.y) && (f3InitialProject.y <= 1.0f);
+			for (int i = 1; i < nVertices; i++)
+			{
+				XMFLOAT3 f3CurrentProject = CGraphicsPipeline::Project(pVertices[i].m_xmf3Position);
+				bCurrentInside = (-1.0f <= f3CurrentProject.x) && (f3CurrentProject.x <= 1.0f) && (-1.0f <= f3CurrentProject.y) && (f3CurrentProject.y <= 1.0f);
+				if (((0.0f <= f3CurrentProject.z) && (f3CurrentProject.z <= 1.0f)) && ((bCurrentInside || bPreviousInside))) ::Draw2DLine(hDCFrameBuffer, f3PreviousProject, f3CurrentProject);
+				f3PreviousProject = f3CurrentProject;
+				bPreviousInside = bCurrentInside;
+			}
+			if (((0.0f <= f3InitialProject.z) && (f3InitialProject.z <= 1.0f)) && ((bInitialInside || bPreviousInside))) ::Draw2DLine(hDCFrameBuffer, f3PreviousProject, f3InitialProject);
 		}
-		if (((0.0f <= f3InitialProject.z) && (f3InitialProject.z <= 1.0f)) && ((bInitialInside || bPreviousInside))) ::Draw2DLine(hDCFrameBuffer, f3PreviousProject, f3InitialProject);
 	}
 }
 
@@ -327,6 +328,12 @@ CMesh::CMesh(const char* filename)
 	m_ppPolygons = new CPolygon * [m_nPolygons];
 
 	for (int i = 0; i < m_nPolygons; ++i) {
+
+		if (faces[i].i[0] < 0 || faces[i].i[1] < 0 || faces[i].i[2] < 0) {
+			m_ppPolygons[i] = nullptr;
+			continue;
+		}
+
 		CPolygon* poly = new CPolygon(3);
 		for (int j = 0; j < 3; ++j) {
 			int vi = faces[i].i[j];
@@ -345,3 +352,101 @@ CLevel_1Mesh::CLevel_1Mesh(const char* filename) : CMesh(filename) {}
 CLevel_2Mesh::CLevel_2Mesh(const char* filename) : CMesh(filename) {}
 CStartMesh::CStartMesh(const char* filename) : CMesh(filename) {}
 CEndMesh::CEndMesh(const char* filename) : CMesh(filename) {}
+
+CRCCubeMesh::CRCCubeMesh(float T, float fWidth, float fHeight) : CMesh(6)
+{
+	XMFLOAT3 p0 = RollerCoasterPos(T);
+	XMFLOAT3 p1 = RollerCoasterPos(T + 0.01f);
+
+	XMVECTOR forward = XMVector3Normalize(XMLoadFloat3(&p1) - XMLoadFloat3(&p0));
+
+	XMVECTOR worldUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+	if (fabs(XMVectorGetX(XMVector3Dot(forward, worldUp))) > 0.99f) {
+		worldUp = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
+	}
+
+	XMVECTOR right = XMVector3Normalize(XMVector3Cross(worldUp, forward));
+	XMVECTOR up = XMVector3Normalize(XMVector3Cross(forward, right));
+
+	right = XMVectorScale(right, fWidth * 0.5f);
+	up = XMVectorScale(up, fHeight * 0.5f);
+
+	XMVECTOR base0 = XMLoadFloat3(&p0);
+	XMVECTOR base1 = XMLoadFloat3(&p1);
+
+	XMVECTOR p0_v[4] = {
+		base0 - right - up,
+		base0 + right - up,
+		base0 + right + up,
+		base0 - right + up
+	};
+
+	XMVECTOR p1_v[4] = {
+		base1 - right - up,
+		base1 + right - up,
+		base1 + right + up,
+		base1 - right + up
+	};
+
+	XMFLOAT3 corners[8];
+	for (int i = 0; i < 4; ++i) XMStoreFloat3(&corners[i], p0_v[i]);
+	for (int i = 0; i < 4; ++i) XMStoreFloat3(&corners[i + 4], p1_v[i]);
+
+	const int faceIndices[6][4] = {
+		{0, 1, 2, 3},
+		{4, 5, 6, 7},
+		{3, 2, 6, 7},
+		{0, 1, 5, 4},
+		{0, 3, 7, 4},
+		{1, 2, 6, 5}
+	};
+
+	for (int i = 0; i < 6; ++i) {
+		CPolygon* poly = new CPolygon(4);
+		for (int j = 0; j < 4; ++j) {
+			XMFLOAT3 pos = corners[faceIndices[i][j]];
+			poly->SetVertex(j, CVertex(pos.x, pos.y, pos.z));
+		}
+		SetPolygon(i, poly);
+	}
+
+	m_xmOOBB = BoundingOrientedBox(p0, XMFLOAT3(0.01f, fHeight, fWidth), XMFLOAT4(0, 0, 0, 1));
+}
+
+XMFLOAT3 RollerCoasterPos(float T) {
+	// f1: [0, 1.42]
+	if (T < 1.42f) {
+		float t = T - 0.71f;
+		return XMFLOAT3(-1.0f, 8.0f * (powf(t, 4) - powf(t, 2)) + 2.0f, t);
+	}
+
+	// f2: [1.42, 2.21]
+	else if (T < 2.21f) {
+		float t = T - 0.71f;
+		return XMFLOAT3(-1.0f, 0.0f, t);
+	}
+
+	// f3: [2.21, 5.35]
+	else if (T < 5.35f) {
+		float t = T - 2.21f;
+		return XMFLOAT3(-cosf(t), 0.0f, sinf(t) + 1.5f);
+	}
+
+	// f4: [5.35, 6.85]
+	else if (T < 6.85f) {
+		float t = T - 6.85f;
+		return XMFLOAT3(1.0f, 0.0f, -t);
+	}
+
+	// f5: [6.85, 13.14]
+	else if (T < 13.14f) {
+		float t = T - 2.14f;
+		return XMFLOAT3(1.0f - 0.1f * (t - 3.0f * XM_PI / 2.0f), sinf(t) + 1.0f, -cosf(t));
+	}
+
+	// f6: [13.14, 15.14]
+	else {
+		float t = T - 13.14f;
+		return XMFLOAT3(1.0f - 0.2f * XM_PI, 0.0f, -t);
+	}
+}

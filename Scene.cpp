@@ -135,49 +135,61 @@ CMenuScene::CMenuScene(CPlayer* pPlayer) : CScene(pPlayer) {}
 void CMenuScene::BuildObjects() {
 	for (int i = 0; i < m_nCubeObjects; i++)
 	{
-		m_pCubeObjects[i] = new CMenuObject();
-		switch (i)
-		{
-		case 4:
-		{
-			CTutorialMesh* pCubeMesh = new CTutorialMesh("Tutorial.obj");
-			m_pCubeObjects[i]->SetMesh(pCubeMesh);
-			break;
+		m_pCubeObjects[i] = nullptr;
+		try {
+			m_pCubeObjects[i] = new CMenuObject();
+			switch (i)
+			{
+			case 4:
+			{
+				CTutorialMesh* pCubeMesh = new CTutorialMesh("Tutorial.obj");
+				m_pCubeObjects[i]->SetMesh(pCubeMesh);
+				break;
+			}
+			case 3:
+			{
+				CLevel_1Mesh* pCubeMesh = new CLevel_1Mesh("Level-1.obj");
+				m_pCubeObjects[i]->SetMesh(pCubeMesh);
+				break;
+			}
+			case 2:
+			{
+				CLevel_2Mesh* pCubeMesh = new CLevel_2Mesh("Level-2.obj");
+				m_pCubeObjects[i]->SetMesh(pCubeMesh);
+				break;
+			}
+			case 1:
+			{
+				CStartMesh* pCubeMesh = new CStartMesh("Start.obj");
+				m_pCubeObjects[i]->SetMesh(pCubeMesh);
+				break;
+			}
+			case 0:
+			{
+				CEndMesh* pCubeMesh = new CEndMesh("End.obj");
+				m_pCubeObjects[i]->SetMesh(pCubeMesh);
+				break;
+			}
+			}
 		}
-		case 3:
-		{
-			CLevel_1Mesh * pCubeMesh = new CLevel_1Mesh("Level-1.obj");
-			m_pCubeObjects[i]->SetMesh(pCubeMesh);
-			break;
-		}
-		case 2:
-		{
-			CLevel_2Mesh * pCubeMesh = new CLevel_2Mesh("Level-2.obj");
-			m_pCubeObjects[i]->SetMesh(pCubeMesh);
-			break;
-		}
-		case 1:
-		{
-			CStartMesh * pCubeMesh = new CStartMesh("Start.obj");
-			m_pCubeObjects[i]->SetMesh(pCubeMesh);
-			break;
-		}
-		case 0:
-		{
-			CEndMesh * pCubeMesh = new CEndMesh("End.obj");
-			m_pCubeObjects[i]->SetMesh(pCubeMesh);
-			break;
-		}
+		catch (std::bad_alloc& ba) {
+			wchar_t msg[64];
+			swprintf_s(msg, 64, L"[ERROR] %s\n", ba.what());
+			OutputDebugString(msg);
 		}
 		m_pCubeObjects[i]->SetColor(RGB(0, 0, 0));
 		m_pCubeObjects[i]->SetPosition(-0.8f, -0.58f + 0.35f * i, 1.0f);
 		m_pCubeObjects[i]->UpdateBoundingBox();
 	}
+
 }
 void CMenuScene::ReleaseObjects()
 {
 	for (int i = 0; i < m_nCubeObjects; i++) {
-		if (m_pCubeObjects[i]) delete m_pCubeObjects[i];
+		if (m_pCubeObjects[i]) {
+			delete m_pCubeObjects[i];
+			m_pCubeObjects[i] = nullptr;
+		}
 	}
 }
 void CMenuScene::Render(HDC hDCFrameBuffer, CCamera* pCamera) {
@@ -186,7 +198,11 @@ void CMenuScene::Render(HDC hDCFrameBuffer, CCamera* pCamera) {
 		//CGraphicsPipeline::SetViewOrthographicProjectTransform(&pCamera->m_xmf4x4ViewOrthographicProject);
 		CGraphicsPipeline::SetViewPerspectiveProjectTransform(&pCamera->m_xmf4x4ViewPerspectiveProject);
 		for (int i = 0; i < m_nCubeObjects; i++) {
-			m_pCubeObjects[i]->Render(hDCFrameBuffer, pCamera);
+
+			wchar_t msg[64];
+			swprintf_s(msg, 64, L"[DEBUG] i = %d\n", i);
+			OutputDebugString(msg);
+			if(m_pCubeObjects[i]) m_pCubeObjects[i]->Render(hDCFrameBuffer, pCamera);
 		}
 }
 void CMenuScene::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
@@ -260,18 +276,38 @@ CGameObject* CMenuScene::PickObjectPointedByCursor(int xClient, int yClient, CCa
 }
 //롤러코스터 Scene////////////////////////////////////////////////////////////////////////////////////////////////
 CRollerCoasterScene::CRollerCoasterScene(CPlayer* pPlayer) : CScene(pPlayer) {}
-void CRollerCoasterScene::BuildObjects() {
-	
+void CRollerCoasterScene::BuildObjects() 
+{
+	m_ppObjects = new CGameObject * [m_nObjects];
+	CTitleMesh* cTitleMesh = new CTitleMesh("Title.obj");
+
+	for (int i = 0; i < m_nObjects; i++) {
+		float t = (float)i / 1000;
+		t = i * 0.01f;
+		CRCCubeMesh* pCubeMesh = new CRCCubeMesh(t);
+		m_ppObjects[i] = new CRollerCoasterObject();
+		m_ppObjects[i]->SetMesh(pCubeMesh);
+		m_ppObjects[i]->SetColor(RGB(0, 0, 255));
+		m_ppObjects[i]->SetPosition(0.0f, 0.0f, 1.0f);
+		m_ppObjects[i]->UpdateBoundingBox();
+	}
 }
 void CRollerCoasterScene::ReleaseObjects()
 {
-	
+	for (int i = 0; i < m_nObjects; i++) {
+		if (m_ppObjects[i]) delete m_ppObjects[i];
+	}
+	delete[] m_ppObjects;
+	m_ppObjects = NULL;
 }
 void CRollerCoasterScene::Render(HDC hDCFrameBuffer, CCamera* pCamera) {
 	CGraphicsPipeline::SetViewport(&pCamera->m_Viewport);
 
 	CGraphicsPipeline::SetViewPerspectiveProjectTransform(&pCamera->m_xmf4x4ViewPerspectiveProject);
-	if (m_pPlayer) m_pPlayer->Render(hDCFrameBuffer, pCamera);
+	//if (m_pPlayer) m_pPlayer->Render(hDCFrameBuffer, pCamera);
+	for (int i = 0; i < m_nObjects; i++) {
+		m_ppObjects[i]->Render(hDCFrameBuffer, pCamera);
+	}
 }
 
 void CRollerCoasterScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
