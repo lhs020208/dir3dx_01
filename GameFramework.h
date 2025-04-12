@@ -31,6 +31,9 @@ private:
 
 	_TCHAR						m_pszFrameRate[50];
 
+	bool m_bPendingSceneChange = false;
+	int m_nPendingSceneNumber = -1;
+
 public:
 	void OnCreate(HINSTANCE hInstance, HWND hMainWnd);
 	void OnDestroy();
@@ -52,5 +55,6 @@ public:
 
 	void SetActive(bool bActive) { m_bActive = bActive; }
 	void ChangeScene(int newSceneNumber);
+	void RequestSceneChange(int sceneNumber);
 };
 

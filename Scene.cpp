@@ -180,6 +180,15 @@ void CMenuScene::BuildObjects() {
 		m_pCubeObjects[i]->SetColor(RGB(0, 0, 0));
 		m_pCubeObjects[i]->SetPosition(-0.8f, -0.58f + 0.35f * i, 1.0f);
 		m_pCubeObjects[i]->UpdateBoundingBox();
+
+		XMFLOAT3 cameraPos = m_pPlayer->GetCamera()->GetPosition();
+		XMFLOAT3 upVector = XMFLOAT3(0.0f, 1.0f, 0.0f);
+		m_pCubeObjects[i]->LookAt(cameraPos, upVector);
+
+		XMMATRIX rotationY = XMMatrixRotationY(XMConvertToRadians(180.0f));
+		XMMATRIX world = XMLoadFloat4x4(&m_pCubeObjects[i]->m_xmf4x4World);
+		world = XMMatrixMultiply(rotationY, world);
+		XMStoreFloat4x4(&m_pCubeObjects[i]->m_xmf4x4World, world);
 	}
 
 }
@@ -198,10 +207,6 @@ void CMenuScene::Render(HDC hDCFrameBuffer, CCamera* pCamera) {
 		//CGraphicsPipeline::SetViewOrthographicProjectTransform(&pCamera->m_xmf4x4ViewOrthographicProject);
 		CGraphicsPipeline::SetViewPerspectiveProjectTransform(&pCamera->m_xmf4x4ViewPerspectiveProject);
 		for (int i = 0; i < m_nCubeObjects; i++) {
-
-			wchar_t msg[64];
-			swprintf_s(msg, 64, L"[DEBUG] i = %d\n", i);
-			OutputDebugString(msg);
 			if(m_pCubeObjects[i]) m_pCubeObjects[i]->Render(hDCFrameBuffer, pCamera);
 		}
 }
@@ -288,7 +293,7 @@ void CRollerCoasterScene::BuildObjects()
 		m_ppObjects[i] = new CRollerCoasterObject();
 		m_ppObjects[i]->SetMesh(pCubeMesh);
 		m_ppObjects[i]->SetColor(RGB(0, 0, 255));
-		m_ppObjects[i]->SetPosition(0.0f, 0.0f, 1.0f);
+		m_ppObjects[i]->SetPosition(0.0f, 0.0f, 0.0f);
 		m_ppObjects[i]->UpdateBoundingBox();
 	}
 }
@@ -304,7 +309,7 @@ void CRollerCoasterScene::Render(HDC hDCFrameBuffer, CCamera* pCamera) {
 	CGraphicsPipeline::SetViewport(&pCamera->m_Viewport);
 
 	CGraphicsPipeline::SetViewPerspectiveProjectTransform(&pCamera->m_xmf4x4ViewPerspectiveProject);
-	//if (m_pPlayer) m_pPlayer->Render(hDCFrameBuffer, pCamera);
+	if (m_pPlayer) m_pPlayer->Render(hDCFrameBuffer, pCamera);
 	for (int i = 0; i < m_nObjects; i++) {
 		m_ppObjects[i]->Render(hDCFrameBuffer, pCamera);
 	}
@@ -318,12 +323,39 @@ void CRollerCoasterScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID
 	case WM_KEYDOWN:
 		switch (wParam)
 		{
+		case 'o':
+		case 'O':
+			m_pPlayer->overview = true;
+			break;
+		case 'l':
+		case 'L':
+			m_pPlayer->overview = false;
+			XMFLOAT3 start_pos = RollerCoasterPos(timer);
+			m_pPlayer->reset();
+			m_pPlayer->SetPosition(start_pos.x, start_pos.y, start_pos.z);
+			m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 0.1f, -1.5f));
+			break;
 		case 'n':
 		case 'N':
 			g_pFramework->ChangeScene(3);
 			break;
+		case 'm':
+		case 'M':
+			XMFLOAT3 playerPos = m_pPlayer->GetPosition();
+			XMFLOAT3 objectPos = m_ppObjects[0]->GetPosition();
+
+			wchar_t msg[128];
+			swprintf_s(msg, 128, L"[DEBUG] Player Pos: (%.2f, %.2f, %.2f)\n", playerPos.x, playerPos.y, playerPos.z);
+			OutputDebugString(msg);
+
+			swprintf_s(msg, 128, L"[DEBUG] Object[0] Pos: (%.2f, %.2f, %.2f)\n", objectPos.x, objectPos.y, objectPos.z);
+			OutputDebugString(msg);
+			break;
 		case VK_ESCAPE:
 			g_pFramework->ChangeScene(1);
+			break;
+		case VK_SPACE:
+			move = true;
 			break;
 		default:
 			break;
@@ -332,4 +364,16 @@ void CRollerCoasterScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID
 	default:
 		break;
 	}
+}
+
+void CRollerCoasterScene::Animate(float fElapsedTime)
+{
+	if (move) {
+		m_pPlayer->SetPosition(RollerCoasterPos(timer).x, RollerCoasterPos(timer).y, RollerCoasterPos(timer).z);
+		timer += speed;
+		if (timer >= 0.71) {
+			speed = 0.005;
+		}
+	}
+
 }

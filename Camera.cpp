@@ -128,24 +128,65 @@ void CCamera::Rotate(float fPitch, float fYaw, float fRoll)
 
 void CCamera::Update(CPlayer* pPlayer, XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 {
-	XMFLOAT4X4 mtxRotate = Matrix4x4::Identity();
-	mtxRotate._11 = pPlayer->m_xmf3Right.x; mtxRotate._21 = pPlayer->m_xmf3Up.x; mtxRotate._31 = pPlayer->m_xmf3Look.x;
-	mtxRotate._12 = pPlayer->m_xmf3Right.y; mtxRotate._22 = pPlayer->m_xmf3Up.y; mtxRotate._32 = pPlayer->m_xmf3Look.y;
-	mtxRotate._13 = pPlayer->m_xmf3Right.z; mtxRotate._23 = pPlayer->m_xmf3Up.z; mtxRotate._33 = pPlayer->m_xmf3Look.z;
+	if (pPlayer->overview == false) {
+		// 1. Up, Look 로드
+		XMVECTOR up = XMVector3Normalize(XMLoadFloat3(&pPlayer->m_xmf3Up));
+		XMVECTOR look = XMVector3Normalize(XMLoadFloat3(&pPlayer->m_xmf3Look));
 
-	XMFLOAT3 xmf3Offset = Vector3::TransformCoord(pPlayer->m_xmf3CameraOffset, mtxRotate);
-	XMFLOAT3 xmf3Position = Vector3::Add(pPlayer->m_xmf3Position, xmf3Offset);
-	XMFLOAT3 xmf3Direction = Vector3::Subtract(xmf3Position, m_xmf3Position);
-	float fLength = Vector3::Length(xmf3Direction);
-	xmf3Direction = Vector3::Normalize(xmf3Direction);
+		// 2. Right = Up x Look
+		XMVECTOR right = XMVector3Normalize(XMVector3Cross(up, look));
 
-	float fTimeLagScale = fTimeElapsed * (1.0f / 0.25f);
-	float fDistance = fLength * fTimeLagScale;
-	if (fDistance > fLength) fDistance = fLength;
-	if (fLength < 0.01f) fDistance = fLength;
-	if (fDistance > 0)
-	{
-		m_xmf3Position = Vector3::Add(m_xmf3Position, xmf3Direction, fDistance);
+		// 3. Look 재정렬 = Right x Up
+		look = XMVector3Normalize(XMVector3Cross(right, up)); // 정직교 보정
+
+		// 4. 회전 행렬 구성
+		XMMATRIX mtxRotate;
+		mtxRotate.r[0] = right;
+		mtxRotate.r[1] = up;
+		mtxRotate.r[2] = look;
+		mtxRotate.r[3] = XMVectorSet(0, 0, 0, 1);
+
+		// 5. 카메라 위치 계산
+		XMFLOAT3 xmf3Offset = Vector3::TransformCoord(pPlayer->m_xmf3CameraOffset, mtxRotate);
+		XMFLOAT3 xmf3Position = Vector3::Add(pPlayer->m_xmf3Position, xmf3Offset);
+
+		// 6. 위치 적용
+		m_xmf3Position = xmf3Position;
+
+		// 7. LookAt 적용 (위치를 바라보게)
 		SetLookAt(pPlayer->m_xmf3Position, pPlayer->m_xmf3Up);
+
+		// 8. 뷰 행렬 갱신
+		GenerateViewMatrix();
 	}
+	else {
+		m_xmf3Position = XMFLOAT3(-20.0f, 35.0f, 20.0f);
+
+		XMFLOAT3 target = XMFLOAT3(0.0f, 0.0f, 0.0f);
+		XMFLOAT3 up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+
+		SetLookAt(m_xmf3Position, target, up);
+		GenerateViewMatrix();
+	}
+}
+
+
+void CCamera::SetOrbitCenter(const XMFLOAT3& center)
+{
+	m_xmf3OrbitCenter = center;
+}
+
+void CCamera::SetOrbitDistance(float distance)
+{
+	m_fOrbitDistance = distance;
+}
+
+void CCamera::RotateOrbit(float deltaYaw, float deltaPitch)
+{
+	m_fOrbitYaw += deltaYaw;
+	m_fOrbitPitch += deltaPitch;
+
+	// pitch 제한
+	if (m_fOrbitPitch > XM_PIDIV2 - 0.01f) m_fOrbitPitch = XM_PIDIV2 - 0.01f;
+	if (m_fOrbitPitch < -XM_PIDIV2 + 0.01f) m_fOrbitPitch = -XM_PIDIV2 + 0.01f;
 }

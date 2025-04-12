@@ -70,15 +70,16 @@ void CGameFramework::BuildObjects()
 
 	pCamera->GenerateOrthographicProjectionMatrix(1.01f, 50.0f, FRAMEBUFFER_WIDTH, FRAMEBUFFER_HEIGHT);
 
-	CAirplaneMesh* pAirplaneMesh = new CAirplaneMesh(1.0f, 1.0f, 1.0f);
+	CAirplaneMesh* pAirplaneMesh = new CAirplaneMesh(0.1f, 0.1f, 0.1f);
 
 	m_pPlayer = new CAirplanePlayer();
 	m_pPlayer->SetPosition(0.0f, 0.0f, 0.0f);
 	m_pPlayer->SetMesh(pAirplaneMesh);
-	m_pPlayer->SetColor(RGB(0, 0, 255));
+	m_pPlayer->SetColor(RGB(255, 0, 0));
 	m_pPlayer->SetCamera(pCamera);
 	m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 0.0f, -1.0f));
-	m_pScene = new CTitleScene(m_pPlayer);
+	//m_pScene = new CTitleScene(m_pPlayer);
+	m_pScene = new CMenuScene(m_pPlayer);
 	m_pScene->BuildObjects();
 }
 
@@ -197,7 +198,6 @@ void CGameFramework::ProcessInput()
 			}
 		}
 	}
-
 	m_pPlayer->Update(m_GameTimer.GetTimeElapsed());
 }
 
@@ -225,6 +225,11 @@ void CGameFramework::FrameAdvance()
 
 	m_GameTimer.GetFrameRate(m_pszFrameRate + 12, 37);
 	::SetWindowText(m_hWnd, m_pszFrameRate);
+
+	if (m_bPendingSceneChange) {
+		ChangeScene(m_nPendingSceneNumber);
+		m_bPendingSceneChange = false;
+	}
 }
 
 
@@ -241,20 +246,33 @@ void CGameFramework::ChangeScene(int newSceneNumber)
 	switch (Scene_number) {
 	case 0:
 		m_pScene = new CTitleScene(m_pPlayer);
+		m_pPlayer->reset();
+		m_pPlayer->SetPosition(0.0f, 0.0f, 0.0f);
 		m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 0.0f, -1.0f));
 		break;
 	case 1:
 		m_pScene = new CMenuScene(m_pPlayer);
+		m_pPlayer->reset();
+		m_pPlayer->SetPosition(0.0f, 0.0f, 0.0f);
 		m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 0.0f, -1.0f));
 		break;
 	case 2:
 		m_pScene = new CRollerCoasterScene(m_pPlayer);
-		m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 1.0f, -3.0f));
+		XMFLOAT3 start_pos = RollerCoasterPos(0.0f);
+		m_pPlayer->reset();
+		m_pPlayer->SetPosition(start_pos.x, start_pos.y, start_pos.z);
+		m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 0.1f, -1.5f));
+
 		break;
 	default:
 		m_pScene = new CScene(m_pPlayer);
 		break;
 	}
-
+	m_pPlayer->overview = false;
 	m_pScene->BuildObjects();
+}
+
+void CGameFramework::RequestSceneChange(int sceneNumber) {
+	m_bPendingSceneChange = true;
+	m_nPendingSceneNumber = sceneNumber;
 }

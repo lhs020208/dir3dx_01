@@ -41,6 +41,11 @@ private:
 	BoundingFrustum				m_xmFrustumWorld = BoundingFrustum();
 	XMFLOAT4X4					m_xmf4x4InverseView = Matrix4x4::Identity();
 
+	XMFLOAT3 m_xmf3OrbitCenter = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	float m_fOrbitYaw = 0.0f;
+	float m_fOrbitPitch = 0.0f;
+	float m_fOrbitDistance = 10.0f;
+
 public:
 	XMFLOAT4X4					m_xmf4x4View = Matrix4x4::Identity();
 	XMFLOAT4X4					m_xmf4x4PerspectiveProject = Matrix4x4::Identity();
@@ -68,4 +73,9 @@ public:
 	void Update(CPlayer* pPlayer, XMFLOAT3& xmf3LookAt, float fTimeElapsed = 0.016f);
 
 	bool IsInFrustum(BoundingOrientedBox& xmBoundingBox);
+	XMFLOAT3 GetPosition() const { return m_xmf3Position; }
+
+	void SetOrbitCenter(const XMFLOAT3& center);
+	void SetOrbitDistance(float distance);
+	void RotateOrbit(float deltaYaw, float deltaPitch);
 };

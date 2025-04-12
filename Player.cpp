@@ -62,7 +62,8 @@ void CPlayer::Move(float x, float y, float z)
 
 void CPlayer::Rotate(float fPitch, float fYaw, float fRoll)
 {
-	m_pCamera->Rotate(fPitch, fYaw, fRoll);
+	//m_pCamera->Rotate(fPitch, fYaw, fRoll);
+	m_pCamera->Rotate(0.0f, fYaw, 0.0f);
 	if (fYaw != 0.0f)
 	{
 		XMMATRIX mtxRotate = XMMatrixRotationAxis(XMLoadFloat3(&m_xmf3Up), XMConvertToRadians(fYaw));
@@ -96,6 +97,23 @@ void CPlayer::Update(float fTimeElapsed)
 	m_xmf3Velocity = Vector3::Add(m_xmf3Velocity, xmf3Deceleration, fDeceleration);
 }
 
+void CPlayer::reset()
+{
+	m_xmf3Position = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	m_xmf3Right = XMFLOAT3(1.0f, 0.0f, 0.0f);
+	m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+	m_xmf3Look = XMFLOAT3(0.0f, 0.0f, 1.0f);
+
+	m_xmf3CameraOffset = XMFLOAT3(0.0f, 0.0f, 0.0f);
+	m_xmf3Velocity = XMFLOAT3(0.0f, 0.0f, 0.0f);
+
+	m_fFriction = 125.0f;
+
+	m_fPitch = 0.0f;
+	m_fYaw = 0.0f;
+	m_fRoll = 0.0f;
+}
+
 void CPlayer::Animate(float fElapsedTime)
 {
 	OnUpdateTransform();
@@ -115,6 +133,12 @@ void CPlayer::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 {
 	CGameObject::Render(hDCFrameBuffer, pCamera);
 }
+
+void CPlayer::SetUp(const XMFLOAT3& xmf3Up)
+{
+	m_xmf3Up = xmf3Up;
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //

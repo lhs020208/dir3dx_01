@@ -262,7 +262,7 @@ void CTitleObject::Animate(float fElapsedTime)
 	{
 		if (!bSceneChanged && m_fElapsedTimes >= (m_fDuration - 0.3f)) {
 			bSceneChanged = true;
-			if (g_pFramework) g_pFramework->ChangeScene(1);
+			if (g_pFramework) g_pFramework->RequestSceneChange(1);
 		}
 
 		m_fElapsedTimes += fElapsedTime;

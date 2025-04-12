@@ -25,6 +25,7 @@ public:
 	float           			m_fRoll = 0.0f;
 
 	CCamera*					m_pCamera = NULL;
+	bool						overview = false;
 
 public:
 	void SetPosition(float x, float y, float z);
@@ -48,6 +49,8 @@ public:
 
 	void SetCamera(CCamera* pCamera) { m_pCamera = pCamera; }
 	CCamera* GetCamera() { return(m_pCamera); }
+	void SetUp(const XMFLOAT3& xmf3Up);
+	void reset();
 };
 
 class CAirplanePlayer : public CPlayer

@@ -126,9 +126,6 @@ public:
 class CRCCubeMesh : public CMesh
 {
 public:
-	CRCCubeMesh(float T, float fWidth = 0.002f, float fHeight = 0.002f);
+	CRCCubeMesh(float T, float fWidth = 0.01f, float fHeight = 0.01f);
 	virtual ~CRCCubeMesh() {}
 };
-
-
-XMFLOAT3 RollerCoasterPos(float T);

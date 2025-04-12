@@ -285,4 +285,5 @@ namespace Plane
 	}
 }
 
-static int Scene_number = 0;
+static int Scene_number = 1;
+XMFLOAT3 RollerCoasterPos(float T);
