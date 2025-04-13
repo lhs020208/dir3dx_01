@@ -132,12 +132,21 @@ public:
 	virtual void Render(HDC hDCFrameBuffer, CCamera* pCamera) override;
 };
 
+class CTankObject : public CGameObject
+{
+public:
+	CTankObject();
+	virtual ~CTankObject();
+
+	virtual void Animate(float fElapsedTime) override;
+	virtual void Render(HDC hDCFrameBuffer, CCamera* pCamera) override;
+};
 
 class CAxisObject : public CGameObject
 {
 public:
-	CAxisObject() { }
-	virtual ~CAxisObject() { }
+	CAxisObject() {}
+	virtual ~CAxisObject() {}
 
 	virtual void Render(HDC hDCFrameBuffer, CCamera* pCamera);
 };

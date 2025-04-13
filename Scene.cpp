@@ -9,10 +9,12 @@ CScene::CScene(CPlayer* pPlayer)
 }
 CScene::~CScene()
 {
+
 }
 
 void CScene::BuildObjects()
 {
+
 }
 
 void CScene::ReleaseObjects()
@@ -385,7 +387,7 @@ void CTankScene::BuildObjects()
 		m_pTank[i] = nullptr;
 		try {
 			m_pTank[i] = new CTankObject();
-			CTankMesh* pTankMesh = new CTankMesh("Tutorial.obj");
+			CTankMesh* pTankMesh = new CTankMesh("Tank.obj");
 			m_pTank[i]->SetMesh(pTankMesh);
 		}
 		catch (std::bad_alloc& ba) {
@@ -393,8 +395,16 @@ void CTankScene::BuildObjects()
 			swprintf_s(msg, 64, L"[ERROR] %s\n", ba.what());
 			OutputDebugString(msg);
 		}
-		m_pCubeObjects[i]->SetColor(RGB(0, 0, 0));
-		m_pCubeObjects[i]->SetPosition(-0.8f, -0.58f + 0.35f * i, 1.0f);
+		m_pTank[i]->SetColor(RGB(0, 0, 0));
+		m_pTank[i]->SetPosition(-2.0f + 0.5f * i, 0.0f, 1.0f);
+		m_pTank[i]->UpdateBoundingBox();
+	}
+	for (int i = 0; i < m_nCubeObjects; i++) {
+		CCubeMesh* pCubeMesh = new CCubeMesh(0.1f, 0.1f, 0.1f);
+		m_pCubeObjects[i] = new CCubeObject();
+		m_pCubeObjects[i]->SetMesh(pCubeMesh);
+		m_pCubeObjects[i]->SetColor(RGB(0, 0, 255));
+		m_pCubeObjects[i]->SetPosition(-2.0f + 0.5f * i, 0.0f, 0.0f);
 		m_pCubeObjects[i]->UpdateBoundingBox();
 	}
 }
@@ -402,7 +412,18 @@ void CTankScene::ReleaseObjects()
 {
 
 }
-void CTankScene::Render(HDC hDCFrameBuffer, CCamera* pCamera) {
+void CTankScene::Render(HDC hDCFrameBuffer, CCamera* pCamera)
+{
+	CGraphicsPipeline::SetViewport(&pCamera->m_Viewport);
+
+	CGraphicsPipeline::SetViewPerspectiveProjectTransform(&pCamera->m_xmf4x4ViewPerspectiveProject);
+	if (m_pPlayer) m_pPlayer->Render(hDCFrameBuffer, pCamera);
+	for (int i = 0; i < m_nTanks; i++) {
+		m_pTank[i]->Render(hDCFrameBuffer, pCamera);
+	}
+	for (int i = 0; i < m_nCubeObjects; i++) {
+		m_pCubeObjects[i]->Render(hDCFrameBuffer, pCamera);
+	}
 }
 
 void CTankScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
@@ -441,4 +462,5 @@ void CTankScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM 
 
 void CTankScene::Animate(float fElapsedTime)
 {
+
 }

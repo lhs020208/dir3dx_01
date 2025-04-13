@@ -81,4 +81,10 @@ public:
 private:
 	int m_nObjects = 1513;
 	CGameObject** m_ppObjects = NULL;
+
+	static const int m_nTanks = 10;
+	CTankObject* m_pTank[m_nTanks];
+
+	static const int m_nCubeObjects = 5;
+	CCubeObject* m_pCubeObjects[m_nCubeObjects];
 };

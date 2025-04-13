@@ -412,3 +412,5 @@ CRCCubeMesh::CRCCubeMesh(float T, float fWidth, float fHeight) : CMesh(6)
 
 	m_xmOOBB = BoundingOrientedBox(p0, XMFLOAT3(0.01f, fHeight, fWidth), XMFLOAT4(0, 0, 0, 1));
 }
+
+CTankMesh::CTankMesh(const char* filename) : CMesh(filename) {}

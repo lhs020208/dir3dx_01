@@ -327,3 +327,18 @@ void CTitleObject::PrepareExplosion()
 		XMStoreFloat3(&m_pxmf3SphereVectors[i], RandomUnitVectorOnSphere());
 	}
 }
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
+CTankObject::CTankObject()
+{
+}
+CTankObject::~CTankObject()
+{
+}
+void CTankObject::Animate(float fElapsedTime)
+{
+}
+void CTankObject::Render(HDC hDCFrameBuffer, CCamera* pCamera)
+{
+	CGameObject::Render(hDCFrameBuffer, pCamera);
+}
