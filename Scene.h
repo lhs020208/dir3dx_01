@@ -68,3 +68,17 @@ private:
 	float timer = 0.0;
 	float speed = 0.001;
 };
+
+class CTankScene : public CScene {
+public:
+	CTankScene(CPlayer* pPlayer);
+	virtual void BuildObjects() override;
+	virtual void ReleaseObjects() override;
+	virtual void Render(HDC hDCFrameBuffer, CCamera* pCamera) override;
+	virtual void Animate(float fElapsedTime) override;
+
+	virtual void OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam) override;
+private:
+	int m_nObjects = 1513;
+	CGameObject** m_ppObjects = NULL;
+};

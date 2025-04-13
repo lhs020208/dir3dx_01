@@ -72,7 +72,7 @@ void CGameFramework::BuildObjects()
 
 	CAirplaneMesh* pAirplaneMesh = new CAirplaneMesh(0.1f, 0.1f, 0.1f);
 
-	m_pPlayer = new CAirplanePlayer();
+	m_pPlayer = new CCubePlayer();
 	m_pPlayer->SetPosition(0.0f, 0.0f, 0.0f);
 	m_pPlayer->SetMesh(pAirplaneMesh);
 	m_pPlayer->SetColor(RGB(255, 0, 0));
@@ -263,6 +263,12 @@ void CGameFramework::ChangeScene(int newSceneNumber)
 		m_pPlayer->SetPosition(start_pos.x, start_pos.y, start_pos.z);
 		m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 0.1f, -1.5f));
 
+		break;
+	case 3:
+		m_pScene = new CTankScene(m_pPlayer);
+		m_pPlayer->reset();
+		m_pPlayer->SetPosition(0.0f, 0.0f, 0.0f);
+		m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 0.1f, -1.5f));
 		break;
 	default:
 		m_pScene = new CScene(m_pPlayer);

@@ -142,27 +142,27 @@ void CPlayer::SetUp(const XMFLOAT3& xmf3Up)
 
 /////////////////////////////////////////////////////////////////////////////////////////////
 //
-CAirplanePlayer::CAirplanePlayer()
+CCubePlayer::CCubePlayer()
 {
 }
 
-CAirplanePlayer::~CAirplanePlayer()
+CCubePlayer::~CCubePlayer()
 {
 }
 
-void CAirplanePlayer::Animate(float fElapsedTime)
+void CCubePlayer::Animate(float fElapsedTime)
 {
 	CPlayer::Animate(fElapsedTime);
 }
 
-void CAirplanePlayer::OnUpdateTransform()
+void CCubePlayer::OnUpdateTransform()
 {
 	CPlayer::OnUpdateTransform();
 
 	m_xmf4x4World = Matrix4x4::Multiply(XMMatrixRotationRollPitchYaw(XMConvertToRadians(90.0f), 0.0f, 0.0f), m_xmf4x4World);
 }
 
-void CAirplanePlayer::Render(HDC hDCFrameBuffer, CCamera* pCamera)
+void CCubePlayer::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 {
 	CPlayer::Render(hDCFrameBuffer, pCamera);
 }

@@ -53,11 +53,11 @@ public:
 	void reset();
 };
 
-class CAirplanePlayer : public CPlayer
+class CCubePlayer : public CPlayer
 {
 public:
-	CAirplanePlayer();
-	virtual ~CAirplanePlayer();
+	CCubePlayer();
+	virtual ~CCubePlayer();
 
 	virtual void OnUpdateTransform();
 	virtual void Animate(float fElapsedTime);

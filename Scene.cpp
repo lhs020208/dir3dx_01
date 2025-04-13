@@ -204,11 +204,10 @@ void CMenuScene::ReleaseObjects()
 void CMenuScene::Render(HDC hDCFrameBuffer, CCamera* pCamera) {
 	CGraphicsPipeline::SetViewport(&pCamera->m_Viewport);
 
-		//CGraphicsPipeline::SetViewOrthographicProjectTransform(&pCamera->m_xmf4x4ViewOrthographicProject);
-		CGraphicsPipeline::SetViewPerspectiveProjectTransform(&pCamera->m_xmf4x4ViewPerspectiveProject);
-		for (int i = 0; i < m_nCubeObjects; i++) {
-			if(m_pCubeObjects[i]) m_pCubeObjects[i]->Render(hDCFrameBuffer, pCamera);
-		}
+	CGraphicsPipeline::SetViewPerspectiveProjectTransform(&pCamera->m_xmf4x4ViewPerspectiveProject);
+	for (int i = 0; i < m_nCubeObjects; i++) {
+		if (m_pCubeObjects[i]) m_pCubeObjects[i]->Render(hDCFrameBuffer, pCamera);
+	}
 }
 void CMenuScene::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 {
@@ -376,4 +375,70 @@ void CRollerCoasterScene::Animate(float fElapsedTime)
 		}
 	}
 
+}
+//탱크 Scene////////////////////////////////////////////////////////////////////////////////////////////////
+CTankScene::CTankScene(CPlayer* pPlayer) : CScene(pPlayer) {}
+void CTankScene::BuildObjects()
+{
+	for (int i = 0; i < m_nTanks; i++)
+	{
+		m_pTank[i] = nullptr;
+		try {
+			m_pTank[i] = new CTankObject();
+			CTankMesh* pTankMesh = new CTankMesh("Tutorial.obj");
+			m_pTank[i]->SetMesh(pTankMesh);
+		}
+		catch (std::bad_alloc& ba) {
+			wchar_t msg[64];
+			swprintf_s(msg, 64, L"[ERROR] %s\n", ba.what());
+			OutputDebugString(msg);
+		}
+		m_pCubeObjects[i]->SetColor(RGB(0, 0, 0));
+		m_pCubeObjects[i]->SetPosition(-0.8f, -0.58f + 0.35f * i, 1.0f);
+		m_pCubeObjects[i]->UpdateBoundingBox();
+	}
+}
+void CTankScene::ReleaseObjects()
+{
+
+}
+void CTankScene::Render(HDC hDCFrameBuffer, CCamera* pCamera) {
+}
+
+void CTankScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
+{
+	extern CGameFramework* g_pFramework;
+	switch (nMessageID)
+	{
+	case WM_KEYDOWN:
+		switch (wParam)
+		{
+		case 'm':
+		case 'M':
+			XMFLOAT3 playerPos = m_pPlayer->GetPosition();
+			XMFLOAT3 objectPos = m_ppObjects[0]->GetPosition();
+
+			wchar_t msg[128];
+			swprintf_s(msg, 128, L"[DEBUG] Player Pos: (%.2f, %.2f, %.2f)\n", playerPos.x, playerPos.y, playerPos.z);
+			OutputDebugString(msg);
+
+			swprintf_s(msg, 128, L"[DEBUG] Object[0] Pos: (%.2f, %.2f, %.2f)\n", objectPos.x, objectPos.y, objectPos.z);
+			OutputDebugString(msg);
+			break;
+		case VK_ESCAPE:
+			g_pFramework->ChangeScene(1);
+			break;
+		case VK_SPACE:
+			break;
+		default:
+			break;
+		}
+		break;
+	default:
+		break;
+	}
+}
+
+void CTankScene::Animate(float fElapsedTime)
+{
 }
