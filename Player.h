@@ -64,3 +64,13 @@ public:
 	virtual void Render(HDC hDCFrameBuffer, CCamera* pCamera);
 };
 
+class CTankPlayer : public CPlayer
+{
+public:
+	CTankPlayer();
+	//virtual ~CTankPlayer();
+
+	virtual void OnUpdateTransform();
+	virtual void Animate(float fElapsedTime);
+	virtual void Render(HDC hDCFrameBuffer, CCamera* pCamera);
+};

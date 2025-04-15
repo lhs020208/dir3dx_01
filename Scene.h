@@ -66,7 +66,7 @@ private:
 	CGameObject** m_ppObjects = NULL;
 	bool move = false;
 	float timer = 0.0;
-	float speed = 0.001;
+	float speed = 0.002;
 };
 
 class CTankScene : public CScene {

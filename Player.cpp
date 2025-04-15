@@ -141,7 +141,6 @@ void CPlayer::SetUp(const XMFLOAT3& xmf3Up)
 
 
 /////////////////////////////////////////////////////////////////////////////////////////////
-//
 CCubePlayer::CCubePlayer()
 {
 }
@@ -163,6 +162,31 @@ void CCubePlayer::OnUpdateTransform()
 }
 
 void CCubePlayer::Render(HDC hDCFrameBuffer, CCamera* pCamera)
+{
+	CPlayer::Render(hDCFrameBuffer, pCamera);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+//
+CTankPlayer::CTankPlayer()
+{
+}
+
+//CTankPlayer::~CTankPlayer() {}
+
+void CTankPlayer::Animate(float fElapsedTime)
+{
+	CPlayer::Animate(fElapsedTime);
+}
+
+void CTankPlayer::OnUpdateTransform()
+{
+	CPlayer::OnUpdateTransform();
+
+	m_xmf4x4World = Matrix4x4::Multiply(XMMatrixRotationRollPitchYaw(XMConvertToRadians(90.0f), 0.0f, 0.0f), m_xmf4x4World);
+}
+
+void CTankPlayer::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 {
 	CPlayer::Render(hDCFrameBuffer, pCamera);
 }

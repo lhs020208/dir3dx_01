@@ -369,14 +369,23 @@ void CRollerCoasterScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID
 
 void CRollerCoasterScene::Animate(float fElapsedTime)
 {
+	extern CGameFramework* g_pFramework;
 	if (move) {
 		m_pPlayer->SetPosition(RollerCoasterPos(timer).x, RollerCoasterPos(timer).y, RollerCoasterPos(timer).z);
 		timer += speed;
 		if (timer >= 0.71) {
+			speed = 0.01;
+		}
+		if (timer >= 1.42) {
 			speed = 0.005;
 		}
 	}
-
+	if (timer >= 15.14) {
+		move = false;
+		timer = 0.0;
+		speed = 0.002;
+		g_pFramework->ChangeScene(3);
+	}
 }
 //탱크 Scene////////////////////////////////////////////////////////////////////////////////////////////////
 CTankScene::CTankScene(CPlayer* pPlayer) : CScene(pPlayer) {}
