@@ -160,14 +160,17 @@ void CCamera::Update(CPlayer* pPlayer, XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 		GenerateViewMatrix();
 	}
 	else {
-		m_xmf3Position = XMFLOAT3(-20.0f, 35.0f, 20.0f);
+		m_xmf3Position = XMFLOAT3(-30.0f, 10.0f, 30.0f);
 
 		XMFLOAT3 target = XMFLOAT3(0.0f, 0.0f, 0.0f);
 		XMFLOAT3 up = XMFLOAT3(0.0f, 1.0f, 0.0f);
 
 		SetLookAt(m_xmf3Position, target, up);
-		//m_xmf3Up = Vector3::Normalize(XMFLOAT3(m_xmf4x4View._12, m_xmf4x4View._22, m_xmf4x4View._32));
+
 		GenerateViewMatrix();
+		//m_xmf3Up = Vector3::Normalize(XMFLOAT3(m_xmf4x4View._12, m_xmf4x4View._22, m_xmf4x4View._32));
+
+		
 	}
 }
 
