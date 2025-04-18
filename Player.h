@@ -27,6 +27,9 @@ public:
 	CCamera*					m_pCamera = NULL;
 	bool						overview = false;
 
+	int							move_z = 0;
+	int							move_x = 0;
+
 public:
 	void SetPosition(float x, float y, float z);
 	void SetRotation(float x, float y, float z);

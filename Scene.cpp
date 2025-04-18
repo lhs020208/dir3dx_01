@@ -36,18 +36,6 @@ void CScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wPar
 	case WM_KEYDOWN:
 		switch (wParam)
 		{
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		case '8':
-		case '9':
-		{
-			break;
-		}
 		case 'A':
 			break;
 		default:
@@ -138,7 +126,7 @@ void CMenuScene::BuildObjects() {
 	for (int i = 0; i < m_nCubeObjects; i++)
 	{
 		m_pCubeObjects[i] = nullptr;
-		try {
+		
 			m_pCubeObjects[i] = new CMenuObject();
 			switch (i)
 			{
@@ -172,13 +160,10 @@ void CMenuScene::BuildObjects() {
 				m_pCubeObjects[i]->SetMesh(pCubeMesh);
 				break;
 			}
+
 			}
-		}
-		catch (std::bad_alloc& ba) {
-			wchar_t msg[64];
-			swprintf_s(msg, 64, L"[ERROR] %s\n", ba.what());
-			OutputDebugString(msg);
-		}
+
+		
 		m_pCubeObjects[i]->SetColor(RGB(0, 0, 0));
 		m_pCubeObjects[i]->SetPosition(-0.8f, -0.58f + 0.35f * i, 1.0f);
 		m_pCubeObjects[i]->UpdateBoundingBox();
@@ -412,7 +397,10 @@ void CTankScene::BuildObjects()
 }
 void CTankScene::ReleaseObjects()
 {
-
+	for (int i = 0; i < m_nTanks; i++)
+		if (m_pTank[i])delete m_pTank[i];
+	for (int i = 0; i < m_nCubeObjects; i++) 
+		if (m_pCubeObjects[i])delete m_pCubeObjects[i];
 }
 void CTankScene::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 {
@@ -436,22 +424,39 @@ void CTankScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM 
 	case WM_KEYDOWN:
 		switch (wParam)
 		{
-		case 'm':
-		case 'M':
-			XMFLOAT3 playerPos = m_pPlayer->GetPosition();
-			XMFLOAT3 objectPos = m_ppObjects[0]->GetPosition();
-
-			wchar_t msg[128];
-			swprintf_s(msg, 128, L"[DEBUG] Player Pos: (%.2f, %.2f, %.2f)\n", playerPos.x, playerPos.y, playerPos.z);
-			OutputDebugString(msg);
-
-			swprintf_s(msg, 128, L"[DEBUG] Object[0] Pos: (%.2f, %.2f, %.2f)\n", objectPos.x, objectPos.y, objectPos.z);
-			OutputDebugString(msg);
+		case 'W':
+			if (m_pPlayer->move_z < 1)m_pPlayer->move_z += 1;
+			break;
+		case 'S':
+			if (m_pPlayer->move_z > -1)m_pPlayer->move_z -= 1;
+			break;
+		case 'A':
+			if (m_pPlayer->move_x > -1)m_pPlayer->move_x -= 1;
+			break;
+		case 'D':
+			if (m_pPlayer->move_x < 1)m_pPlayer->move_x += 1;
 			break;
 		case VK_ESCAPE:
 			g_pFramework->ChangeScene(1);
 			break;
-		case VK_SPACE:
+		default:
+			break;
+		}
+		break;
+	case WM_KEYUP:
+		switch (wParam)
+		{
+		case 'W':
+			if (m_pPlayer->move_z > -1)m_pPlayer->move_z -= 1;
+			break;
+		case 'S':
+			if (m_pPlayer->move_z < 1)m_pPlayer->move_z += 1;
+			break;
+		case 'A':
+			if (m_pPlayer->move_x < 1)m_pPlayer->move_x += 1;
+			break;
+		case 'D':
+			if (m_pPlayer->move_x > -1)m_pPlayer->move_x -= 1;
 			break;
 		default:
 			break;

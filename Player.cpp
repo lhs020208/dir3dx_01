@@ -175,14 +175,23 @@ CTankPlayer::CTankPlayer()
 
 void CTankPlayer::Animate(float fElapsedTime)
 {
-	/*
 	XMFLOAT3 front = GetLook();
 	front.x = front.x * fElapsedTime * 0.5f;
-	front.y = front.y * fElapsedTime * 0.5f;
 	front.z = front.z * fElapsedTime * 0.5f;
+
+	XMFLOAT3 right = GetRight();
+	right.x = right.x * fElapsedTime * 0.5f;
+	right.z = right.z * fElapsedTime * 0.5f;
+
+	XMFLOAT3 addV;
+	addV.x = (front.x + right.x) * move_x;
+	addV.z = (front.z + right.z) * move_z;
 	XMFLOAT3 now_pos = GetPosition();
-	SetPosition(now_pos.x + front.x, now_pos.y + front.y, now_pos.z + front.z);
-	*/
+
+	SetPosition(now_pos.x + addV.x, 
+				now_pos.y, 
+				now_pos.z + addV.z);
+
 	CTankPlayer::OnUpdateTransform();
 }
 
