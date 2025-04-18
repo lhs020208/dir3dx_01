@@ -337,6 +337,7 @@ CTankObject::~CTankObject()
 }
 void CTankObject::Animate(float fElapsedTime)
 {
+	SetPosition(Vector3::Add(GetPosition(), Vector3::ScalarProduct(GetLook(), fElapsedTime * 0.5f, false)));
 }
 void CTankObject::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 {

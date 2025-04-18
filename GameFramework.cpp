@@ -78,8 +78,8 @@ void CGameFramework::BuildObjects()
 	m_pPlayer->SetColor(RGB(255, 0, 0));
 	m_pPlayer->SetCamera(pCamera);
 	m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 0.0f, -1.0f));
-	m_pScene = new CTitleScene(m_pPlayer);
-	//m_pScene = new CMenuScene(m_pPlayer);
+	//m_pScene = new CTitleScene(m_pPlayer);
+	m_pScene = new CMenuScene(m_pPlayer);
 	m_pScene->BuildObjects();
 }
 
@@ -242,6 +242,15 @@ void CGameFramework::ChangeScene(int newSceneNumber)
 	}
 
 	Scene_number = newSceneNumber;
+	CTankMesh* pTankMesh = new CTankMesh("Tank.obj");
+	CCubeMesh* pCubeMesh = new CCubeMesh(0.1f, 0.1f, 0.1f);
+	CCamera* pCamera = new CCamera();
+
+	pCamera->SetViewport(0, 0, FRAMEBUFFER_WIDTH, FRAMEBUFFER_HEIGHT);
+	pCamera->GeneratePerspectiveProjectionMatrix(1.01f, 500.0f, 60.0f);
+	pCamera->SetFOVAngle(60.0f);
+
+	pCamera->GenerateOrthographicProjectionMatrix(1.01f, 50.0f, FRAMEBUFFER_WIDTH, FRAMEBUFFER_HEIGHT);
 
 	switch (Scene_number) {
 	case 0:
@@ -257,25 +266,27 @@ void CGameFramework::ChangeScene(int newSceneNumber)
 		m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 0.0f, -1.0f));
 		break;
 	case 2:
-		m_pScene = new CRollerCoasterScene(m_pPlayer);
 		XMFLOAT3 start_pos = RollerCoasterPos(0.0f);
-		m_pPlayer->reset();
+		m_pPlayer = new CCubePlayer;
+		m_pPlayer->SetMesh(pCubeMesh);
 		m_pPlayer->SetPosition(start_pos.x, start_pos.y, start_pos.z);
-		m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 0.1f, -1.5f));
-
+		m_pPlayer->SetCamera(pCamera);
+		m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 0.1f, -2.0f));
+		m_pScene = new CRollerCoasterScene(m_pPlayer);
 		break;
 	case 3:
-		m_pScene = new CTankScene(m_pPlayer);
+		m_pPlayer = new CTankPlayer;
+		m_pPlayer->SetMesh(pTankMesh);
 		m_pPlayer->reset();
 		m_pPlayer->SetPosition(0.0f, 0.0f, 0.0f);
+		m_pPlayer->SetCamera(pCamera);
 		m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 0.1f, -1.5f));
-		break;
-	default:
-		m_pScene = new CScene(m_pPlayer);
+		m_pScene = new CTankScene(m_pPlayer);
 		break;
 	}
 	m_pPlayer->overview = false;
 	m_pScene->BuildObjects();
+
 }
 
 void CGameFramework::RequestSceneChange(int sceneNumber) {

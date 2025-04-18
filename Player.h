@@ -71,6 +71,6 @@ public:
 	//virtual ~CTankPlayer();
 
 	virtual void OnUpdateTransform();
-	virtual void Animate(float fElapsedTime);
+	virtual void Animate(float fElapsedTime) override;
 	virtual void Render(HDC hDCFrameBuffer, CCamera* pCamera);
 };

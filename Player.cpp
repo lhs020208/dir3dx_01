@@ -72,14 +72,14 @@ void CPlayer::Rotate(float fPitch, float fYaw, float fRoll)
 	}
 	m_xmf3Look = Vector3::Normalize(m_xmf3Look);
 	m_xmf3Right = Vector3::Normalize(Vector3::CrossProduct(m_xmf3Up, m_xmf3Look));
-	m_xmf3Up = Vector3::Normalize(Vector3::CrossProduct(m_xmf3Look, m_xmf3Right));
+	m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
 }
 
 void CPlayer::LookAt(XMFLOAT3& xmf3LookAt, XMFLOAT3& xmf3Up)
 {
 	XMFLOAT4X4 xmf4x4View = Matrix4x4::LookAtLH(m_xmf3Position, xmf3LookAt, xmf3Up);
 	m_xmf3Right = Vector3::Normalize(XMFLOAT3(xmf4x4View._11, xmf4x4View._21, xmf4x4View._31));
-	m_xmf3Up = Vector3::Normalize(XMFLOAT3(xmf4x4View._12, xmf4x4View._22, xmf4x4View._32));
+	m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
 	m_xmf3Look = Vector3::Normalize(XMFLOAT3(xmf4x4View._13, xmf4x4View._23, xmf4x4View._33));
 }
 
@@ -117,7 +117,6 @@ void CPlayer::reset()
 void CPlayer::Animate(float fElapsedTime)
 {
 	OnUpdateTransform();
-
 	CGameObject::Animate(fElapsedTime);
 }
 
@@ -136,7 +135,7 @@ void CPlayer::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 
 void CPlayer::SetUp(const XMFLOAT3& xmf3Up)
 {
-	m_xmf3Up = xmf3Up;
+	m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
 }
 
 
@@ -176,14 +175,20 @@ CTankPlayer::CTankPlayer()
 
 void CTankPlayer::Animate(float fElapsedTime)
 {
-	CPlayer::Animate(fElapsedTime);
+	/*
+	XMFLOAT3 front = GetLook();
+	front.x = front.x * fElapsedTime * 0.5f;
+	front.y = front.y * fElapsedTime * 0.5f;
+	front.z = front.z * fElapsedTime * 0.5f;
+	XMFLOAT3 now_pos = GetPosition();
+	SetPosition(now_pos.x + front.x, now_pos.y + front.y, now_pos.z + front.z);
+	*/
+	CTankPlayer::OnUpdateTransform();
 }
 
 void CTankPlayer::OnUpdateTransform()
 {
 	CPlayer::OnUpdateTransform();
-
-	m_xmf4x4World = Matrix4x4::Multiply(XMMatrixRotationRollPitchYaw(XMConvertToRadians(90.0f), 0.0f, 0.0f), m_xmf4x4World);
 }
 
 void CTankPlayer::Render(HDC hDCFrameBuffer, CCamera* pCamera)

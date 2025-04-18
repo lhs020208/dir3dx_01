@@ -394,16 +394,9 @@ void CTankScene::BuildObjects()
 	for (int i = 0; i < m_nTanks; i++)
 	{
 		m_pTank[i] = nullptr;
-		try {
-			m_pTank[i] = new CTankObject();
-			CTankMesh* pTankMesh = new CTankMesh("Tank.obj");
-			m_pTank[i]->SetMesh(pTankMesh);
-		}
-		catch (std::bad_alloc& ba) {
-			wchar_t msg[64];
-			swprintf_s(msg, 64, L"[ERROR] %s\n", ba.what());
-			OutputDebugString(msg);
-		}
+		m_pTank[i] = new CTankObject();
+		CTankMesh* pTankMesh = new CTankMesh("Tank.obj");
+		m_pTank[i]->SetMesh(pTankMesh);
 		m_pTank[i]->SetColor(RGB(0, 0, 0));
 		m_pTank[i]->SetPosition(-2.0f + 0.5f * i, 0.0f, 1.0f);
 		m_pTank[i]->UpdateBoundingBox();
@@ -471,5 +464,8 @@ void CTankScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM 
 
 void CTankScene::Animate(float fElapsedTime)
 {
-
+	for (int i = 0; i < 10; i++) {
+		m_pTank[i]->Animate(fElapsedTime);
+	}
+	m_pPlayer->Animate(fElapsedTime);
 }
