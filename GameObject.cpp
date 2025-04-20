@@ -337,9 +337,70 @@ CTankObject::~CTankObject()
 }
 void CTankObject::Animate(float fElapsedTime)
 {
-	SetPosition(Vector3::Add(GetPosition(), Vector3::ScalarProduct(GetLook(), fElapsedTime * 0.5f, false)));
+	if (IsExist()) {
+		if (m_bBlowingUp)
+		{
+			m_fElapsedTimes += fElapsedTime;
+			if (m_fElapsedTimes >= m_fDuration)
+			{
+				SetExist(false);
+				return;
+			}
+
+			for (int i = 0; i < EXPLOSION_DEBRISES; i++) {
+				XMFLOAT3 direction = m_pxmf3SphereVectors[i];
+				XMFLOAT3 position = Vector3::Add(GetPosition(), Vector3::ScalarProduct(direction, m_fElapsedTimes * m_fExplosionSpeed));
+				XMFLOAT4X4 world = Matrix4x4::RotationAxis(direction, m_fElapsedTimes * XMConvertToRadians(m_fExplosionRotation));
+				world._41 = position.x; world._42 = position.y; world._43 = position.z;
+				m_pxmf4x4Transforms[i] = world;
+			}
+		}
+		else
+		{
+			int forward_Step = 100;
+			if (timer < forward_Step)
+				SetPosition(Vector3::Add(GetPosition(), Vector3::ScalarProduct(GetLook(), fElapsedTime * 0.5f, false)));
+			if (timer >= forward_Step && timer < forward_Step + 90)
+				Rotate(0.0f, 2.0f, 0.0f);
+			if (timer >= forward_Step + 90 && timer < 2 * forward_Step + 90)
+				SetPosition(Vector3::Add(GetPosition(), Vector3::ScalarProduct(GetLook(), fElapsedTime * 0.5f, false)));
+			if (timer >= 2 * forward_Step + 90 && timer < 2 * forward_Step + 180)
+				Rotate(0.0f, 2.0f, 0.0f);
+
+			UpdateBoundingBox();
+
+			timer++;
+			if (timer == 2 * forward_Step + 180) timer = 0;
+		}
+	}
 }
 void CTankObject::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 {
-	CGameObject::Render(hDCFrameBuffer, pCamera);
+	if (IsExist()) {
+		if (m_bBlowingUp)
+		{
+			for (int i = 0; i < EXPLOSION_DEBRISES; i++) {
+				if (pCamera->IsInFrustum(m_xmOOBB)) {
+					CGameObject::Render(hDCFrameBuffer, &m_pxmf4x4Transforms[i], m_pExplosionMesh);
+				}
+			}
+		}
+		else
+		{
+			CGameObject::Render(hDCFrameBuffer, pCamera);
+		}
+	}
+}
+
+CMesh* CTankObject::m_pExplosionMesh = NULL;
+void CTankObject::PrepareExplosion()
+{
+	m_bBlowingUp = true;
+	m_fElapsedTimes = 0.0f;
+
+	if (!m_pExplosionMesh) m_pExplosionMesh = new CCubeMesh(0.05f, 0.05f, 0.05f);
+
+	for (int i = 0; i < EXPLOSION_DEBRISES; i++) {
+		XMStoreFloat3(&m_pxmf3SphereVectors[i], RandomUnitVectorOnSphere());
+	}
 }

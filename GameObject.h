@@ -140,6 +140,24 @@ public:
 
 	virtual void Animate(float fElapsedTime) override;
 	virtual void Render(HDC hDCFrameBuffer, CCamera* pCamera) override;
+	void PrepareExplosion();
+	bool IsBlowingUp() { return m_bBlowingUp; }
+	bool IsExist() { return is_exist; }
+	void SetExist(bool exist) { is_exist = exist; }
+private:
+	bool is_exist = true;
+	bool m_bBlowingUp = false;
+	bool m_bPrevBlowingUp = false;
+	float m_fElapsedTimes = 0.0f;
+	float m_fDuration = 2.0f;
+	float m_fExplosionSpeed = 2.0f;
+	float m_fExplosionRotation = 360.0f;
+	int timer = 0;
+
+	XMFLOAT4X4 m_pxmf4x4Transforms[EXPLOSION_DEBRISES];
+	XMFLOAT3 m_pxmf3SphereVectors[EXPLOSION_DEBRISES];
+
+	static CMesh* m_pExplosionMesh;
 };
 
 class CAxisObject : public CGameObject

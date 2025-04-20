@@ -26,6 +26,7 @@ void CCamera::GenerateViewMatrix()
 	m_xmf3Look = Vector3::Normalize(m_xmf3Look);
 	m_xmf3Right = Vector3::Normalize(Vector3::CrossProduct(m_xmf3Up, m_xmf3Look));
 	m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+	//m_xmf3Up = Vector3::Normalize(Vector3::CrossProduct(m_xmf3Look, m_xmf3Right));
 	m_xmf4x4View._11 = m_xmf3Right.x; m_xmf4x4View._12 = m_xmf3Up.x; m_xmf4x4View._13 = m_xmf3Look.x;
 	m_xmf4x4View._21 = m_xmf3Right.y; m_xmf4x4View._22 = m_xmf3Up.y; m_xmf4x4View._23 = m_xmf3Look.y;
 	m_xmf4x4View._31 = m_xmf3Right.z; m_xmf4x4View._32 = m_xmf3Up.z; m_xmf4x4View._33 = m_xmf3Look.z;
@@ -42,6 +43,12 @@ void CCamera::GenerateViewMatrix()
 	m_xmf4x4InverseView._41 = m_xmf3Position.x; m_xmf4x4InverseView._42 = m_xmf3Position.y; m_xmf4x4InverseView._43 = m_xmf3Position.z;
 
 	m_xmFrustumView.Transform(m_xmFrustumWorld, XMLoadFloat4x4(&m_xmf4x4InverseView));
+
+	XMVECTOR eye = XMLoadFloat3(&m_xmf3Position);
+	XMVECTOR at = XMLoadFloat3(&m_xmf3Look); // 이 값은 SetLookAt에서 설정돼 있어야 함
+	XMVECTOR up = XMLoadFloat3(&m_xmf3Up);
+
+	XMStoreFloat4x4(&m_xmf4x4View, XMMatrixLookAtLH(eye, at, up));
 }
 
 void CCamera::SetLookAt(XMFLOAT3& xmf3Position, XMFLOAT3& xmf3LookAt, XMFLOAT3& xmf3Up)
@@ -128,6 +135,7 @@ void CCamera::Rotate(float fPitch, float fYaw, float fRoll)
 
 void CCamera::Update(CPlayer* pPlayer, XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 {
+
 	if (pPlayer->overview == false) {
 		// 1. Up, Look 로드
 		XMVECTOR up = XMVector3Normalize(XMLoadFloat3(&pPlayer->m_xmf3Up));
@@ -155,7 +163,6 @@ void CCamera::Update(CPlayer* pPlayer, XMFLOAT3& xmf3LookAt, float fTimeElapsed)
 
 		// 7. LookAt 적용 (위치를 바라보게)
 		SetLookAt(pPlayer->m_xmf3Position, XMFLOAT3(0.0f, 1.0f, 0.0f));
-
 		// 8. 뷰 행렬 갱신
 		GenerateViewMatrix();
 	}

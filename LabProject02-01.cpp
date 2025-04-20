@@ -45,7 +45,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance,
 	}
 
 	hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_LABPROJECT0201));
-
 	// 기본 메시지 루프입니다.
 	while (1)
 	{

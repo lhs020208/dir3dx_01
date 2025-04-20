@@ -33,3 +33,4 @@ XMFLOAT3 RollerCoasterPos(float T) {
         return XMFLOAT3(10.0f * (1.0f - 0.2f * XM_PI), 0.0f, -10.0f * t);
     }
 }
+int Scene_number = 1;

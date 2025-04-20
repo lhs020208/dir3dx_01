@@ -436,6 +436,12 @@ void CTankScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM 
 		case 'D':
 			if (m_pPlayer->move_x < 1)m_pPlayer->move_x += 1;
 			break;
+		case VK_SPACE:
+			for (int i = 0; i < 10; i ++)
+			if (!m_pTank[i]->IsBlowingUp()) {
+				m_pTank[i]->PrepareExplosion();
+			}
+			break;
 		case VK_ESCAPE:
 			g_pFramework->ChangeScene(1);
 			break;

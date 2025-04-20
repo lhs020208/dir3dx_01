@@ -87,4 +87,6 @@ private:
 
 	static const int m_nCubeObjects = 5;
 	CCubeObject* m_pCubeObjects[m_nCubeObjects];
+
+	CAxisObject* m_pAxisObject;
 };

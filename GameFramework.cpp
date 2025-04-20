@@ -65,7 +65,7 @@ void CGameFramework::BuildObjects()
 {
 	CCamera* pCamera = new CCamera();
 	pCamera->SetViewport(0, 0, FRAMEBUFFER_WIDTH, FRAMEBUFFER_HEIGHT);
-	pCamera->GeneratePerspectiveProjectionMatrix(1.01f, 500.0f, 60.0f);
+	pCamera->GeneratePerspectiveProjectionMatrix(1.0f, 1000.0f, 60.0f);
 	pCamera->SetFOVAngle(60.0f);
 
 	pCamera->GenerateOrthographicProjectionMatrix(1.01f, 50.0f, FRAMEBUFFER_WIDTH, FRAMEBUFFER_HEIGHT);
@@ -166,6 +166,7 @@ LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMess
 
 void CGameFramework::ProcessInput()
 {
+	extern int Scene_number;
 	static UCHAR pKeyBuffer[256];
 	if (GetKeyboardState(pKeyBuffer))
 	{
@@ -235,6 +236,7 @@ void CGameFramework::FrameAdvance()
 
 void CGameFramework::ChangeScene(int newSceneNumber)
 {
+	extern int Scene_number;
 	if (m_pScene) {
 		m_pScene->ReleaseObjects();
 		delete m_pScene;
@@ -247,7 +249,7 @@ void CGameFramework::ChangeScene(int newSceneNumber)
 	CCamera* pCamera = new CCamera();
 
 	pCamera->SetViewport(0, 0, FRAMEBUFFER_WIDTH, FRAMEBUFFER_HEIGHT);
-	pCamera->GeneratePerspectiveProjectionMatrix(1.01f, 500.0f, 60.0f);
+	pCamera->GeneratePerspectiveProjectionMatrix(1.0f, 1000.0f, 60.0f);
 	pCamera->SetFOVAngle(60.0f);
 
 	pCamera->GenerateOrthographicProjectionMatrix(1.01f, 50.0f, FRAMEBUFFER_WIDTH, FRAMEBUFFER_HEIGHT);
@@ -280,7 +282,7 @@ void CGameFramework::ChangeScene(int newSceneNumber)
 		m_pPlayer->reset();
 		m_pPlayer->SetPosition(0.0f, 0.0f, 0.0f);
 		m_pPlayer->SetCamera(pCamera);
-		m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 0.1f, -1.5f));
+		m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 0.5f, -3.0f));
 		m_pScene = new CTankScene(m_pPlayer);
 		break;
 	}

@@ -175,22 +175,24 @@ CTankPlayer::CTankPlayer()
 
 void CTankPlayer::Animate(float fElapsedTime)
 {
-	XMFLOAT3 front = GetLook();
-	front.x = front.x * fElapsedTime * 0.5f;
-	front.z = front.z * fElapsedTime * 0.5f;
-
+	XMFLOAT3 look = GetLook();
 	XMFLOAT3 right = GetRight();
-	right.x = right.x * fElapsedTime * 0.5f;
-	right.z = right.z * fElapsedTime * 0.5f;
 
-	XMFLOAT3 addV;
-	addV.x = (front.x + right.x) * move_x;
-	addV.z = (front.z + right.z) * move_z;
+	XMFLOAT3 moveVec = { 0.0f, 0.0f, 0.0f };
+
+	// 이동 거리 스케일
+	float speed = fElapsedTime * 0.5f;
+
+	// 방향별 적용
+	moveVec.x += right.x * move_x * speed;
+	moveVec.z += right.z * move_x * speed;
+
+	moveVec.x += look.x * move_z * speed;
+	moveVec.z += look.z * move_z * speed;
+
+	// 위치 갱신
 	XMFLOAT3 now_pos = GetPosition();
-
-	SetPosition(now_pos.x + addV.x, 
-				now_pos.y, 
-				now_pos.z + addV.z);
+	SetPosition(now_pos.x + moveVec.x, now_pos.y, now_pos.z + moveVec.z);
 
 	CTankPlayer::OnUpdateTransform();
 }
