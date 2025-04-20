@@ -132,6 +132,16 @@ public:
 	virtual void Render(HDC hDCFrameBuffer, CCamera* pCamera) override;
 };
 
+class CBulletObject : public CGameObject
+{
+public:
+	CBulletObject();
+	virtual ~CBulletObject();
+
+	virtual void Animate(float fElapsedTime) override;
+	virtual void Render(HDC hDCFrameBuffer, CCamera* pCamera) override;
+};
+
 class CTankObject : public CGameObject
 {
 public:
@@ -144,6 +154,7 @@ public:
 	bool IsBlowingUp() { return m_bBlowingUp; }
 	bool IsExist() { return is_exist; }
 	void SetExist(bool exist) { is_exist = exist; }
+	CBulletObject* bullet;
 private:
 	bool is_exist = true;
 	bool m_bBlowingUp = false;
@@ -153,6 +164,7 @@ private:
 	float m_fExplosionSpeed = 2.0f;
 	float m_fExplosionRotation = 360.0f;
 	int timer = 0;
+	bool shot = false;
 
 	XMFLOAT4X4 m_pxmf4x4Transforms[EXPLOSION_DEBRISES];
 	XMFLOAT3 m_pxmf3SphereVectors[EXPLOSION_DEBRISES];

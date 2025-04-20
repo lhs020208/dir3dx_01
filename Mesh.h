@@ -130,3 +130,10 @@ public:
 	CTankMesh(const char* filename);
 	virtual ~CTankMesh() {}
 };
+
+class CBulletMesh : public CMesh
+{
+public:
+	CBulletMesh(const char* filename);
+	virtual ~CBulletMesh() {}
+};

@@ -385,6 +385,13 @@ void CTankScene::BuildObjects()
 		m_pTank[i]->SetColor(RGB(0, 0, 0));
 		m_pTank[i]->SetPosition(-2.0f + 0.5f * i, 0.0f, 1.0f);
 		m_pTank[i]->UpdateBoundingBox();
+
+		m_pTank[i]->bullet = new CBulletObject();
+		CBulletMesh* pBulletMesh = new CBulletMesh("Bullet.obj");
+		m_pTank[i]->bullet->SetMesh(pBulletMesh);
+		m_pTank[i]->bullet->SetColor(RGB(0, 0, 0));
+		m_pTank[i]->bullet->SetPosition(-2.0f + 0.5f * i, 0.0f, 1.0f);
+		m_pTank[i]->bullet->UpdateBoundingBox();
 	}
 	for (int i = 0; i < m_nCubeObjects; i++) {
 		CCubeMesh* pCubeMesh = new CCubeMesh(0.1f, 0.1f, 0.1f);

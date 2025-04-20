@@ -364,3 +364,4 @@ CRCCubeMesh::CRCCubeMesh(float T, float fWidth, float fHeight) : CMesh(6)
 }
 
 CTankMesh::CTankMesh(const char* filename) : CMesh(filename) {}
+CBulletMesh::CBulletMesh(const char* filename) : CMesh(filename) {}

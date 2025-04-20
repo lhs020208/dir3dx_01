@@ -388,6 +388,8 @@ void CTankObject::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 		else
 		{
 			CGameObject::Render(hDCFrameBuffer, pCamera);
+			if (shot) 
+				bullet->Render(hDCFrameBuffer, pCamera);
 		}
 	}
 }
@@ -403,4 +405,17 @@ void CTankObject::PrepareExplosion()
 	for (int i = 0; i < EXPLOSION_DEBRISES; i++) {
 		XMStoreFloat3(&m_pxmf3SphereVectors[i], RandomUnitVectorOnSphere());
 	}
+}
+CBulletObject::CBulletObject()
+{
+}
+CBulletObject::~CBulletObject()
+{
+}
+void CBulletObject::Animate(float fElapsedTime)
+{
+}
+void CBulletObject::Render(HDC hDCFrameBuffer, CCamera* pCamera)
+{
+	CGameObject::Render(hDCFrameBuffer, pCamera);
 }
