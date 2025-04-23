@@ -371,6 +371,37 @@ void CTankObject::Animate(float fElapsedTime)
 
 			timer++;
 			if (timer == 2 * forward_Step + 180) timer = 0;
+
+			if (shot) {
+				bullet_timer++;
+				bullet->SetPosition(Vector3::Add(bullet->GetPosition(), Vector3::ScalarProduct(bullet->GetLook(), fElapsedTime * 2.0f, false)));
+				if (bullet_timer >= 100) {
+					bullet_timer = 0;
+					SwitchShot();
+				}
+			}
+			else {
+				using namespace std;
+				default_random_engine dre{ random_device{}() };
+				uniform_int_distribution<int> uid{ 0,500 };
+				if (uid(dre) == 0) {
+					bullet->SetPosition(GetPosition().x, GetPosition().y, GetPosition().z);
+
+					XMFLOAT3 right = GetRight();
+					XMFLOAT3 up = GetUp();
+					XMFLOAT3 look = GetLook();
+
+					XMFLOAT4X4 rotationMatrix;
+					rotationMatrix._11 = right.x; rotationMatrix._12 = right.y; rotationMatrix._13 = right.z; rotationMatrix._14 = 0.0f;
+					rotationMatrix._21 = up.x;    rotationMatrix._22 = up.y;    rotationMatrix._23 = up.z;    rotationMatrix._24 = 0.0f;
+					rotationMatrix._31 = look.x;  rotationMatrix._32 = look.y;  rotationMatrix._33 = look.z;  rotationMatrix._34 = 0.0f;
+					rotationMatrix._41 = 0.0f;    rotationMatrix._42 = 0.0f;    rotationMatrix._43 = 0.0f;    rotationMatrix._44 = 1.0f;
+
+					bullet->SetRotationTransform(&rotationMatrix);
+
+					SwitchShot();
+				}
+			}
 		}
 	}
 }

@@ -276,7 +276,7 @@ void CGameFramework::ChangeScene(int newSceneNumber)
 			pTankPlayer->m_pShild = new CCubeObject();
 			CCubeMesh* pShildMesh = new CCubeMesh(0.6f, 0.6f, 0.6f);
 			pTankPlayer->m_pShild->SetMesh(pShildMesh);
-			pTankPlayer->m_pShild->SetColor(RGB(0, 0, 0));
+			pTankPlayer->m_pShild->SetColor(RGB(255, 0, 0));
 			pTankPlayer->m_pShild->SetPosition(0.0f, 0.0f, 0.0f);
 		}
 
