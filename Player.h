@@ -76,4 +76,8 @@ public:
 	virtual void OnUpdateTransform();
 	virtual void Animate(float fElapsedTime) override;
 	virtual void Render(HDC hDCFrameBuffer, CCamera* pCamera);
+
+	bool OnShild = true;
+	void SwitchShild();
+	CCubeObject* m_pShild;
 };

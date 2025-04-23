@@ -79,8 +79,7 @@ public:
 
 	virtual void OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam) override;
 private:
-	int m_nObjects = 1513;
-	CGameObject** m_ppObjects = NULL;
+	CCubeObject* m_pFloorObject;
 
 	static const int m_nTanks = 10;
 	CTankObject* m_pTank[m_nTanks];

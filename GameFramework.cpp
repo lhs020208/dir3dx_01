@@ -120,19 +120,6 @@ void CGameFramework::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPA
 {
 	if (m_pScene) m_pScene->OnProcessingKeyboardMessage(hWnd, nMessageID, wParam, lParam);
 
-	switch (nMessageID)
-	{
-	case WM_KEYDOWN:
-		switch (wParam)
-		{
-		default:
-			m_pScene->OnProcessingKeyboardMessage(hWnd, nMessageID, wParam, lParam);
-			break;
-		}
-		break;
-	default:
-		break;
-	}
 }
 
 LRESULT CALLBACK CGameFramework::OnProcessingWindowMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
@@ -283,6 +270,16 @@ void CGameFramework::ChangeScene(int newSceneNumber)
 		m_pPlayer->SetPosition(0.0f, 0.0f, 0.0f);
 		m_pPlayer->SetCamera(pCamera);
 		m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 0.5f, -3.0f));
+
+		CTankPlayer* pTankPlayer = dynamic_cast<CTankPlayer*>(m_pPlayer);
+		if (pTankPlayer) {
+			pTankPlayer->m_pShild = new CCubeObject();
+			CCubeMesh* pShildMesh = new CCubeMesh(0.6f, 0.6f, 0.6f);
+			pTankPlayer->m_pShild->SetMesh(pShildMesh);
+			pTankPlayer->m_pShild->SetColor(RGB(0, 0, 0));
+			pTankPlayer->m_pShild->SetPosition(0.0f, 0.0f, 0.0f);
+		}
+
 		m_pScene = new CTankScene(m_pPlayer);
 		break;
 	}

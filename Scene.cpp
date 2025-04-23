@@ -401,11 +401,20 @@ void CTankScene::BuildObjects()
 		m_pCubeObjects[i]->SetPosition(-2.0f + 0.5f * i, 0.0f, 0.0f);
 		m_pCubeObjects[i]->UpdateBoundingBox();
 	}
+	CCubeMesh* pCubeMesh = new CCubeMesh(1.0f, 0.0f, 1.0f);
+	m_pFloorObject = new CCubeObject();
+	m_pFloorObject->SetMesh(pCubeMesh);
+	m_pFloorObject->SetColor(RGB(0, 0, 0));
+	m_pFloorObject->SetPosition(0.0f, -0.2f, 0.0f);
+	m_pFloorObject->UpdateBoundingBox();
 }
 void CTankScene::ReleaseObjects()
 {
-	for (int i = 0; i < m_nTanks; i++)
+	if (m_pFloorObject) delete m_pFloorObject;
+	for (int i = 0; i < m_nTanks; i++) {
+		if (m_pTank[i]->bullet)delete m_pTank[i]->bullet;
 		if (m_pTank[i])delete m_pTank[i];
+	}
 	for (int i = 0; i < m_nCubeObjects; i++) 
 		if (m_pCubeObjects[i])delete m_pCubeObjects[i];
 }
@@ -415,6 +424,7 @@ void CTankScene::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 
 	CGraphicsPipeline::SetViewPerspectiveProjectTransform(&pCamera->m_xmf4x4ViewPerspectiveProject);
 	if (m_pPlayer) m_pPlayer->Render(hDCFrameBuffer, pCamera);
+	if (m_pFloorObject) m_pFloorObject->Render(hDCFrameBuffer, pCamera);
 	for (int i = 0; i < m_nTanks; i++) {
 		m_pTank[i]->Render(hDCFrameBuffer, pCamera);
 	}
@@ -426,6 +436,7 @@ void CTankScene::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 void CTankScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 {
 	extern CGameFramework* g_pFramework;
+	CTankPlayer* pTankPlayer = dynamic_cast<CTankPlayer*>(m_pPlayer);
 	switch (nMessageID)
 	{
 	case WM_KEYDOWN:
@@ -448,6 +459,15 @@ void CTankScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM 
 			if (!m_pTank[i]->IsBlowingUp()) {
 				m_pTank[i]->PrepareExplosion();
 			}
+			break;
+		case 'Q':
+			if (pTankPlayer) {
+				pTankPlayer->SwitchShild();
+				OutputDebugString(L"Q키 눌림\n");
+			}
+			break;
+		case 'E':
+			//발사
 			break;
 		case VK_ESCAPE:
 			g_pFramework->ChangeScene(1);
@@ -485,5 +505,6 @@ void CTankScene::Animate(float fElapsedTime)
 	for (int i = 0; i < 10; i++) {
 		m_pTank[i]->Animate(fElapsedTime);
 	}
-	m_pPlayer->Animate(fElapsedTime);
+	CTankPlayer* pTankPlayer = dynamic_cast<CTankPlayer*>(m_pPlayer);
+	pTankPlayer->Animate(fElapsedTime);
 }

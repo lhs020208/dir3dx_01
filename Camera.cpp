@@ -24,8 +24,8 @@ CCamera::~CCamera()
 void CCamera::GenerateViewMatrix()
 {
 	m_xmf3Look = Vector3::Normalize(m_xmf3Look);
-	m_xmf3Right = Vector3::Normalize(Vector3::CrossProduct(m_xmf3Up, m_xmf3Look));
 	m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+	m_xmf3Right = Vector3::Normalize(Vector3::CrossProduct(m_xmf3Up, m_xmf3Look));
 	//m_xmf3Up = Vector3::Normalize(Vector3::CrossProduct(m_xmf3Look, m_xmf3Right));
 	m_xmf4x4View._11 = m_xmf3Right.x; m_xmf4x4View._12 = m_xmf3Up.x; m_xmf4x4View._13 = m_xmf3Look.x;
 	m_xmf4x4View._21 = m_xmf3Right.y; m_xmf4x4View._22 = m_xmf3Up.y; m_xmf4x4View._23 = m_xmf3Look.y;
@@ -97,7 +97,8 @@ void CCamera::GenerateOrthographicProjectionMatrix(float fNearPlaneDistance, flo
 
 bool CCamera::IsInFrustum(BoundingOrientedBox& xmBoundingBox)
 {
-	return(m_xmFrustumWorld.Intersects(xmBoundingBox));
+	//return(m_xmFrustumWorld.Intersects(xmBoundingBox));
+	return true;
 }
 
 void CCamera::Move(XMFLOAT3& xmf3Shift)

@@ -193,6 +193,7 @@ void CTankPlayer::Animate(float fElapsedTime)
 	// 위치 갱신
 	XMFLOAT3 now_pos = GetPosition();
 	SetPosition(now_pos.x + moveVec.x, now_pos.y, now_pos.z + moveVec.z);
+	m_pShild->SetPosition(now_pos.x + moveVec.x, now_pos.y, now_pos.z + moveVec.z);
 
 	CTankPlayer::OnUpdateTransform();
 }
@@ -202,7 +203,14 @@ void CTankPlayer::OnUpdateTransform()
 	CPlayer::OnUpdateTransform();
 }
 
+void CTankPlayer::SwitchShild() {
+	OnShild = !OnShild;
+}
+
 void CTankPlayer::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 {
 	CPlayer::Render(hDCFrameBuffer, pCamera);
+	if (OnShild && m_pShild) {
+		m_pShild->Render(hDCFrameBuffer, pCamera);
+	}
 }
