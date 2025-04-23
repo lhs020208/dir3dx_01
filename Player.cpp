@@ -196,6 +196,16 @@ void CTankPlayer::Animate(float fElapsedTime)
 	m_pShild->SetPosition(now_pos.x + moveVec.x, now_pos.y, now_pos.z + moveVec.z);
 
 	CTankPlayer::OnUpdateTransform();
+
+
+	if (shot) {
+		bullet_timer++;
+		m_pBullet->SetPosition(Vector3::Add(m_pBullet->GetPosition(), Vector3::ScalarProduct(m_pBullet->GetLook(), fElapsedTime * 2.0f, false)));
+		if (bullet_timer >= 100) {
+			bullet_timer = 0;
+			SwitchBullet();
+		}
+	}
 }
 
 void CTankPlayer::OnUpdateTransform()
@@ -203,9 +213,6 @@ void CTankPlayer::OnUpdateTransform()
 	CPlayer::OnUpdateTransform();
 }
 
-void CTankPlayer::SwitchShild() {
-	OnShild = !OnShild;
-}
 
 void CTankPlayer::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 {
@@ -213,4 +220,24 @@ void CTankPlayer::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 	if (OnShild && m_pShild) {
 		m_pShild->Render(hDCFrameBuffer, pCamera);
 	}
+	if (shot) {
+		m_pBullet->Render(hDCFrameBuffer, pCamera);
+	}
+}
+
+void CTankPlayer::SetBulletPosition()
+{
+	m_pBullet->SetPosition(GetPosition().x, GetPosition().y, GetPosition().z);
+
+	XMFLOAT3 right = GetRight();
+	XMFLOAT3 up = GetUp();
+	XMFLOAT3 look = GetLook();
+
+	XMFLOAT4X4 rotationMatrix;
+	rotationMatrix._11 = right.x; rotationMatrix._12 = right.y; rotationMatrix._13 = right.z; rotationMatrix._14 = 0.0f;
+	rotationMatrix._21 = up.x;    rotationMatrix._22 = up.y;    rotationMatrix._23 = up.z;    rotationMatrix._24 = 0.0f;
+	rotationMatrix._31 = look.x;  rotationMatrix._32 = look.y;  rotationMatrix._33 = look.z;  rotationMatrix._34 = 0.0f;
+	rotationMatrix._41 = 0.0f;    rotationMatrix._42 = 0.0f;    rotationMatrix._43 = 0.0f;    rotationMatrix._44 = 1.0f;
+
+	m_pBullet->SetRotationTransform(&rotationMatrix);
 }

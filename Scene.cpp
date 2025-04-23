@@ -471,11 +471,13 @@ void CTankScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM 
 		case 'Q':
 			if (pTankPlayer) {
 				pTankPlayer->SwitchShild();
-				OutputDebugString(L"Q키 눌림\n");
 			}
 			break;
 		case 'E':
-			//발사
+			if (pTankPlayer && !pTankPlayer->shot) {
+				pTankPlayer->SwitchBullet();
+				pTankPlayer->SetBulletPosition();
+			}
 			break;
 		case VK_ESCAPE:
 			g_pFramework->ChangeScene(1);

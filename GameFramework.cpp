@@ -278,6 +278,13 @@ void CGameFramework::ChangeScene(int newSceneNumber)
 			pTankPlayer->m_pShild->SetMesh(pShildMesh);
 			pTankPlayer->m_pShild->SetColor(RGB(255, 0, 0));
 			pTankPlayer->m_pShild->SetPosition(0.0f, 0.0f, 0.0f);
+
+			pTankPlayer->m_pBullet = new CBulletObject();
+			CBulletMesh* pBulletMesh = new CBulletMesh("Bullet.obj");
+			pTankPlayer->m_pBullet->SetMesh(pBulletMesh);
+			pTankPlayer->m_pBullet->SetColor(RGB(255, 0, 0));
+			pTankPlayer->m_pBullet->SetPosition(0.0f, 0.0f, 0.0f);
+			pTankPlayer->m_pBullet->UpdateBoundingBox();
 		}
 
 		m_pScene = new CTankScene(m_pPlayer);

@@ -78,6 +78,12 @@ public:
 	virtual void Render(HDC hDCFrameBuffer, CCamera* pCamera);
 
 	bool OnShild = false;
-	void SwitchShild();
+	void SwitchShild() {OnShild = !OnShild;}
+	bool shot = false;
+	void SwitchBullet() { shot = !shot; }
+	int bullet_timer = 0;
+	void CTankPlayer::SetBulletPosition();
+
 	CCubeObject* m_pShild;
+	CBulletObject* m_pBullet;
 };
