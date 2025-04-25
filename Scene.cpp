@@ -433,9 +433,9 @@ void CTankScene::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 	CGraphicsPipeline::SetViewPerspectiveProjectTransform(&pCamera->m_xmf4x4ViewPerspectiveProject);
 	if (m_pPlayer) m_pPlayer->Render(hDCFrameBuffer, pCamera);
 	if (m_pFloorObject) {
-		for (int i = 0; i < 30; i++) {
-			for (int j = 0; j < 30; j++) {
-				m_pFloorObject->SetPosition(-15.0f + 1.0f * i, -0.2f, -15.0f + 1.0f * j);
+		for (int i = 0; i < 20; i++) {
+			for (int j = 0; j < 20; j++) {
+				m_pFloorObject->SetPosition(-10.0f + 1.0f * i, -0.2f, -10.0f + 1.0f * j);
 				m_pFloorObject->Render(hDCFrameBuffer, pCamera);
 			}
 		}

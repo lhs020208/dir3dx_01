@@ -373,7 +373,7 @@ void CTankObject::Animate(float fElapsedTime)
 			if (shot) {
 				bullet_timer++;
 				bullet->SetPosition(Vector3::Add(bullet->GetPosition(), Vector3::ScalarProduct(bullet->GetLook(), fElapsedTime * 2.0f, false)));
-				if (bullet_timer >= 100) {
+				if (bullet_timer >= 200) {
 					bullet_timer = 0;
 					SwitchShot();
 				}
@@ -413,7 +413,7 @@ void CTankObject::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 		{
 			for (int i = 0; i < EXPLOSION_DEBRISES; i++) {
 				if (pCamera->IsInFrustum(m_xmOOBB)) {
-					if (m_pxmf4x4Transforms[i]._42 > 0.2f) {
+					if (m_pxmf4x4Transforms[i]._42 > -0.2f) {
 						CGameObject::Render(hDCFrameBuffer, &m_pxmf4x4Transforms[i], m_pExplosionMesh);
 					}
 				}
@@ -453,3 +453,4 @@ void CBulletObject::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 {
 	CGameObject::Render(hDCFrameBuffer, pCamera);
 }
+
