@@ -404,6 +404,7 @@ void CTankObject::Animate(float fElapsedTime)
 	}
 
 	UpdateBoundingBox();
+	bullet->UpdateBoundingBox();
 }
 void CTankObject::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 {
@@ -412,7 +413,9 @@ void CTankObject::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 		{
 			for (int i = 0; i < EXPLOSION_DEBRISES; i++) {
 				if (pCamera->IsInFrustum(m_xmOOBB)) {
-					CGameObject::Render(hDCFrameBuffer, &m_pxmf4x4Transforms[i], m_pExplosionMesh);
+					if (m_pxmf4x4Transforms[i]._42 > 0.2f) {
+						CGameObject::Render(hDCFrameBuffer, &m_pxmf4x4Transforms[i], m_pExplosionMesh);
+					}
 				}
 			}
 		}

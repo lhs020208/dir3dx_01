@@ -432,7 +432,14 @@ void CTankScene::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 
 	CGraphicsPipeline::SetViewPerspectiveProjectTransform(&pCamera->m_xmf4x4ViewPerspectiveProject);
 	if (m_pPlayer) m_pPlayer->Render(hDCFrameBuffer, pCamera);
-	if (m_pFloorObject) m_pFloorObject->Render(hDCFrameBuffer, pCamera);
+	if (m_pFloorObject) {
+		for (int i = 0; i < 30; i++) {
+			for (int j = 0; j < 30; j++) {
+				m_pFloorObject->SetPosition(-15.0f + 1.0f * i, -0.2f, -15.0f + 1.0f * j);
+				m_pFloorObject->Render(hDCFrameBuffer, pCamera);
+			}
+		}
+	}
 	for (int i = 0; i < m_nTanks; i++) {
 		m_pTank[i]->Render(hDCFrameBuffer, pCamera);
 	}
@@ -528,6 +535,35 @@ void CTankScene::CheckTankByBulletCollisions()
 		}
 	}
 }
+void CTankScene::CheckPlayerByBulletCollisions()
+{
+	CTankPlayer* pTankPlayer = dynamic_cast<CTankPlayer*>(m_pPlayer);
+	if (pTankPlayer) {
+		for (int i = 0; i < 10; i++)
+		{
+			if (!pTankPlayer->OnShild) {
+				if (m_pTank[i]->IsExist() && m_pTank[i]->IsShot())
+					if (pTankPlayer->m_xmOOBB.Intersects(m_pTank[i]->bullet->m_xmOOBB))
+					{
+						DWORD color = m_pTank[i]->m_dwColor;
+
+						pTankPlayer->SetColor(color);
+						pTankPlayer->m_pBullet->SetColor(color);
+						pTankPlayer->m_pShild->SetColor(color);
+
+						m_pTank[i]->SwitchShot();
+					}
+			}
+			else {
+				if (m_pTank[i]->IsExist() && m_pTank[i]->IsShot())
+					if (pTankPlayer->m_pShild->m_xmOOBB.Intersects(m_pTank[i]->bullet->m_xmOOBB))
+					{
+						m_pTank[i]->SwitchShot();
+					}
+			}
+		}
+	}
+}
 
 void CTankScene::Animate(float fElapsedTime)
 {
@@ -538,5 +574,5 @@ void CTankScene::Animate(float fElapsedTime)
 	pTankPlayer->Animate(fElapsedTime);
 
 	CheckTankByBulletCollisions();
-
+	CheckPlayerByBulletCollisions();
 }

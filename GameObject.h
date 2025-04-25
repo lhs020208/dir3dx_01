@@ -155,7 +155,8 @@ public:
 	bool IsExist() { return is_exist; }
 	void SetExist(bool exist) { is_exist = exist; }
 
-	void SwitchShot() { shot = !shot; }
+	void SwitchShot() { shot = !shot; bullet_timer = 0; }
+	bool IsShot() { return shot; }
 	CBulletObject* bullet;
 
 
