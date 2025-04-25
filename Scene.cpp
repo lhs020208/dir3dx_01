@@ -382,6 +382,10 @@ void CTankScene::BuildObjects()
 		default_random_engine dre{ random_device{}() };
 		uniform_int_distribution<int> uid{ 0,255 };
 
+		uniform_real_distribution<float> uid_x{ 0,18.0f };
+		uniform_real_distribution<float> uid_z{ 0,18.0f };
+		uniform_real_distribution<float> uid_rot{ 0,360.0f };
+
 		float red = uid(dre);
 		float green = uid(dre);
 		float blue = uid(dre);
@@ -391,7 +395,8 @@ void CTankScene::BuildObjects()
 		CTankMesh* pTankMesh = new CTankMesh("Tank.obj");
 		m_pTank[i]->SetMesh(pTankMesh);
 		m_pTank[i]->SetColor(RGB(red, green, blue));
-		m_pTank[i]->SetPosition(-2.0f + 0.5f * i, 0.0f, 1.0f);
+		m_pTank[i]->SetPosition(uid_x(dre) - 9.0f, 0.0f, uid_z(dre) - 9.0f);
+		m_pTank[i]->Rotate(0.0f, uid_rot(dre), 0.0f);
 		m_pTank[i]->UpdateBoundingBox();
 
 		m_pTank[i]->bullet = new CBulletObject();
