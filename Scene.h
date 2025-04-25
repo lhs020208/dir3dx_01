@@ -78,6 +78,8 @@ public:
 	virtual void Animate(float fElapsedTime) override;
 
 	virtual void OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam) override;
+
+	void CTankScene::CheckTankByBulletCollisions();
 private:
 	CCubeObject* m_pFloorObject;
 

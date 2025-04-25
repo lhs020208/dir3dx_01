@@ -207,6 +207,10 @@ void CTankPlayer::Animate(float fElapsedTime)
 			SwitchBullet();
 		}
 	}
+
+	UpdateBoundingBox();
+	m_pBullet->UpdateBoundingBox();
+	m_pShild->UpdateBoundingBox();
 }
 
 void CTankPlayer::OnUpdateTransform()
@@ -258,4 +262,5 @@ void CTankPlayer::Rotate(float fPitch, float fYaw, float fRoll)
 
 	m_pShild->SetRotationTransform(&rotationMatrix);
 
+	UpdateBoundingBox();
 }

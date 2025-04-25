@@ -510,6 +510,25 @@ void CTankScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM 
 	}
 }
 
+void CTankScene::CheckTankByBulletCollisions()
+{
+	CTankPlayer* pTankPlayer = dynamic_cast<CTankPlayer*>(m_pPlayer);
+	if (pTankPlayer && pTankPlayer->shot) {
+		for (int i = 0; i < 10; i++)
+		{
+			if (m_pTank[i]->IsExist())
+			if (m_pTank[i]->m_xmOOBB.Intersects(pTankPlayer->m_pBullet->m_xmOOBB))
+			{
+				if (!m_pTank[i]->IsBlowingUp()) {
+					m_pTank[i]->PrepareExplosion();
+					pTankPlayer->shot = false;
+					pTankPlayer->bullet_timer = 0;
+				}
+			}
+		}
+	}
+}
+
 void CTankScene::Animate(float fElapsedTime)
 {
 	for (int i = 0; i < 10; i++) {
@@ -517,4 +536,7 @@ void CTankScene::Animate(float fElapsedTime)
 	}
 	CTankPlayer* pTankPlayer = dynamic_cast<CTankPlayer*>(m_pPlayer);
 	pTankPlayer->Animate(fElapsedTime);
+
+	CheckTankByBulletCollisions();
+
 }

@@ -293,7 +293,31 @@ CMesh::CMesh(const char* filename)
 		SetPolygon(i, poly);
 	}
 
-	m_xmOOBB = BoundingOrientedBox(XMFLOAT3(0, 0, 0), XMFLOAT3(1, 1, 1), XMFLOAT4(0, 0, 0, 1));
+	XMFLOAT3 min = vertices[0], max = vertices[0];
+	for (const auto& v : vertices) {
+		if (v.x < min.x) min.x = v.x;
+		if (v.y < min.y) min.y = v.y;
+		if (v.z < min.z) min.z = v.z;
+
+		if (v.x > max.x) max.x = v.x;
+		if (v.y > max.y) max.y = v.y;
+		if (v.z > max.z) max.z = v.z;
+	}
+
+	// 중심과 Extents 계산
+	XMFLOAT3 center = XMFLOAT3(
+		(min.x + max.x) / 2.0f,
+		(min.y + max.y) / 2.0f,
+		(min.z + max.z) / 2.0f
+	);
+	XMFLOAT3 extents = XMFLOAT3(
+		(max.x - min.x) / 2.0f,
+		(max.y - min.y) / 2.0f,
+		(max.z - min.z) / 2.0f
+	);
+
+	// OOBB 설정 (기본 orientation)
+	m_xmOOBB = BoundingOrientedBox(center, extents, XMFLOAT4(0, 0, 0, 1));
 }
 
 CTitleMesh::CTitleMesh(const char* filename) : CMesh(filename) {}

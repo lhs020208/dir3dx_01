@@ -367,8 +367,6 @@ void CTankObject::Animate(float fElapsedTime)
 			if (timer >= 2 * forward_Step + 90 && timer < 2 * forward_Step + 180)
 				Rotate(0.0f, 2.0f, 0.0f);
 
-			UpdateBoundingBox();
-
 			timer++;
 			if (timer == 2 * forward_Step + 180) timer = 0;
 
@@ -404,6 +402,8 @@ void CTankObject::Animate(float fElapsedTime)
 			}
 		}
 	}
+
+	UpdateBoundingBox();
 }
 void CTankObject::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 {
