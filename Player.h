@@ -40,7 +40,7 @@ public:
 	void Move(XMFLOAT3& xmf3Shift, bool bUpdateVelocity);
 	void Move(float x, float y, float z);
 
-	void Rotate(float fPitch = 0.0f, float fYaw = 0.0f, float fRoll = 0.0f);
+	virtual void Rotate(float fPitch = 0.0f, float fYaw = 0.0f, float fRoll = 0.0f);
 
 	void SetCameraOffset(XMFLOAT3& xmf3CameraOffset);
 
@@ -75,7 +75,8 @@ public:
 
 	virtual void OnUpdateTransform();
 	virtual void Animate(float fElapsedTime) override;
-	virtual void Render(HDC hDCFrameBuffer, CCamera* pCamera);
+	virtual void Render(HDC hDCFrameBuffer, CCamera* pCamera) override;
+	virtual void Rotate(float fPitch = 0.0f, float fYaw = 0.0f, float fRoll = 0.0f) override;
 
 	bool OnShild = false;
 	void SwitchShild() {OnShild = !OnShild;}

@@ -193,16 +193,8 @@ void CTankPlayer::Animate(float fElapsedTime)
 	// 위치 갱신
 	XMFLOAT3 now_pos = GetPosition();
 	SetPosition(now_pos.x + moveVec.x, now_pos.y, now_pos.z + moveVec.z);
-	XMFLOAT3 up = GetUp();
-
-	XMFLOAT4X4 rotationMatrix;
-	rotationMatrix._11 = right.x; rotationMatrix._12 = right.y; rotationMatrix._13 = right.z; rotationMatrix._14 = 0.0f;
-	rotationMatrix._21 = up.x;    rotationMatrix._22 = up.y;    rotationMatrix._23 = up.z;    rotationMatrix._24 = 0.0f;
-	rotationMatrix._31 = look.x;  rotationMatrix._32 = look.y;  rotationMatrix._33 = look.z;  rotationMatrix._34 = 0.0f;
-	rotationMatrix._41 = 0.0f;    rotationMatrix._42 = 0.0f;    rotationMatrix._43 = 0.0f;    rotationMatrix._44 = 1.0f;
 
 	m_pShild->SetPosition(now_pos.x + moveVec.x, now_pos.y, now_pos.z + moveVec.z);
-	m_pShild->SetRotationTransform(&rotationMatrix);
 
 	CTankPlayer::OnUpdateTransform();
 
@@ -249,4 +241,21 @@ void CTankPlayer::SetBulletPosition()
 	rotationMatrix._41 = 0.0f;    rotationMatrix._42 = 0.0f;    rotationMatrix._43 = 0.0f;    rotationMatrix._44 = 1.0f;
 
 	m_pBullet->SetRotationTransform(&rotationMatrix);
+}
+
+void CTankPlayer::Rotate(float fPitch, float fYaw, float fRoll)
+{
+	CPlayer::Rotate(fPitch, fYaw, fRoll);
+	XMFLOAT3 right = GetRight();
+	XMFLOAT3 up = GetUp();
+	XMFLOAT3 look = GetLook();
+
+	XMFLOAT4X4 rotationMatrix;
+	rotationMatrix._11 = right.x; rotationMatrix._12 = right.y; rotationMatrix._13 = right.z; rotationMatrix._14 = 0.0f;
+	rotationMatrix._21 = up.x;    rotationMatrix._22 = up.y;    rotationMatrix._23 = up.z;    rotationMatrix._24 = 0.0f;
+	rotationMatrix._31 = look.x;  rotationMatrix._32 = look.y;  rotationMatrix._33 = look.z;  rotationMatrix._34 = 0.0f;
+	rotationMatrix._41 = 0.0f;    rotationMatrix._42 = 0.0f;    rotationMatrix._43 = 0.0f;    rotationMatrix._44 = 1.0f;
+
+	m_pShild->SetRotationTransform(&rotationMatrix);
+
 }
