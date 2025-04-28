@@ -82,7 +82,7 @@ void CTitleScene::Animate(float fElapsedTime)
 }
 CGameObject* CTitleScene::PickObjectPointedByCursor(int xClient, int yClient, CCamera* pCamera)
 {
-	
+
 	XMFLOAT3 xmf3PickPosition;
 	xmf3PickPosition.x = (((2.0f * xClient) / (float)pCamera->m_Viewport.m_nWidth) - 1) / pCamera->m_xmf4x4PerspectiveProject._11;
 	xmf3PickPosition.y = -(((2.0f * yClient) / (float)pCamera->m_Viewport.m_nHeight) - 1) / pCamera->m_xmf4x4PerspectiveProject._22;
@@ -102,8 +102,8 @@ CGameObject* CTitleScene::PickObjectPointedByCursor(int xClient, int yClient, CC
 		}
 	}
 	return(pNearestObject);
-	
 }
+
 void CTitleScene::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
 {
 	switch (nMessageID)
