@@ -87,4 +87,7 @@ public:
 
 	CCubeObject* m_pShild;
 	CBulletObject* m_pBullet;
+
+	CTankObject* ToggleObject;
+	bool Toggle = false;
 };

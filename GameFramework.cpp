@@ -269,7 +269,8 @@ void CGameFramework::ChangeScene(int newSceneNumber)
 		m_pPlayer->reset();
 		m_pPlayer->SetPosition(0.0f, 0.0f, 0.0f);
 		m_pPlayer->SetCamera(pCamera);
-		m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 0.5f, -3.0f));
+		//m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 0.5f, -3.0f));
+		m_pPlayer->SetCameraOffset(XMFLOAT3(0.0f, 0.0f, -0.1f));
 
 		CTankPlayer* pTankPlayer = dynamic_cast<CTankPlayer*>(m_pPlayer);
 		if (pTankPlayer) {

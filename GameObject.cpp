@@ -192,7 +192,6 @@ int CGameObject::PickObjectByRayIntersection(XMVECTOR& xmvPickPosition, XMMATRIX
 	}
 	return(nIntersected);
 }
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////
 
 CCubeObject::CCubeObject()
@@ -402,7 +401,7 @@ void CTankObject::Animate(float fElapsedTime)
 			}
 		}
 	}
-
+	
 	UpdateBoundingBox();
 	bullet->UpdateBoundingBox();
 }

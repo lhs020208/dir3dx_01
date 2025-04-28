@@ -75,31 +75,14 @@ void CTitleScene::Render(HDC hDCFrameBuffer, CCamera* pCamera) {
 
 	if (m_pTitleObjects) m_pTitleObjects->Render(hDCFrameBuffer, pCamera);
 }
-void CTitleScene::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
-{
-	switch (nMessageID)
-	{
-	case WM_LBUTTONDOWN:
-		int x = LOWORD(lParam);
-		int y = HIWORD(lParam);
-		CCamera* pCamera = m_pPlayer->GetCamera();  //여기서 확보
-		CGameObject* pPickedObject = PickObjectPointedByCursor(x, y, pCamera);
 
-		if (pPickedObject) {
-			if (!m_pTitleObjects->IsBlowingUp()) {
-				m_pTitleObjects->PrepareExplosion();
-			}
-		}
-
-	}
-}
 void CTitleScene::Animate(float fElapsedTime)
 {
 	if (m_pTitleObjects) m_pTitleObjects->Animate(fElapsedTime);
 }
 CGameObject* CTitleScene::PickObjectPointedByCursor(int xClient, int yClient, CCamera* pCamera)
 {
-
+	
 	XMFLOAT3 xmf3PickPosition;
 	xmf3PickPosition.x = (((2.0f * xClient) / (float)pCamera->m_Viewport.m_nWidth) - 1) / pCamera->m_xmf4x4PerspectiveProject._11;
 	xmf3PickPosition.y = -(((2.0f * yClient) / (float)pCamera->m_Viewport.m_nHeight) - 1) / pCamera->m_xmf4x4PerspectiveProject._22;
@@ -119,6 +102,25 @@ CGameObject* CTitleScene::PickObjectPointedByCursor(int xClient, int yClient, CC
 		}
 	}
 	return(pNearestObject);
+	
+}
+void CTitleScene::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
+{
+	switch (nMessageID)
+	{
+	case WM_LBUTTONDOWN:
+		int x = LOWORD(lParam);
+		int y = HIWORD(lParam);
+		CCamera* pCamera = m_pPlayer->GetCamera();  //여기서 확보
+		CGameObject* pPickedObject = PickObjectPointedByCursor(x, y, pCamera);
+
+		if (pPickedObject) {
+			if (!m_pTitleObjects->IsBlowingUp()) {
+				m_pTitleObjects->PrepareExplosion();
+			}
+		}
+
+	}
 }
 //메뉴 Scene////////////////////////////////////////////////////////////////////////////////////////////////
 CMenuScene::CMenuScene(CPlayer* pPlayer) : CScene(pPlayer) {}
@@ -420,6 +422,13 @@ void CTankScene::BuildObjects()
 	m_pFloorObject->SetColor(RGB(0, 0, 0));
 	m_pFloorObject->SetPosition(0.0f, -0.2f, 0.0f);
 	m_pFloorObject->UpdateBoundingBox();
+
+	CCubeMesh* RayMesh = new CCubeMesh(0.0f, 0.0f, 0.0f);
+	ray = new CCubeObject();
+	ray->SetMesh(RayMesh);
+	ray->SetColor(RGB(0, 0, 255));
+	ray->SetPosition(0.0f, 0.0f, 0.0f);
+	ray->UpdateBoundingBox();
 }
 void CTankScene::ReleaseObjects()
 {
@@ -445,11 +454,14 @@ void CTankScene::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 			}
 		}
 	}
-	for (int i = 0; i < m_nTanks; i++) {
+	for (int i = 0; i < 10; i++) {
 		m_pTank[i]->Render(hDCFrameBuffer, pCamera);
 	}
 	for (int i = 0; i < m_nCubeObjects; i++) {
 		m_pCubeObjects[i]->Render(hDCFrameBuffer, pCamera);
+	}
+	if (isray) {
+		ray->Render(hDCFrameBuffer, pCamera);
 	}
 }
 
@@ -494,6 +506,16 @@ void CTankScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM 
 		case VK_ESCAPE:
 			g_pFramework->ChangeScene(1);
 			break;
+		case VK_RETURN:
+			if (pTankPlayer->Toggle) {
+				pTankPlayer->Toggle = false;
+				m_pFloorObject->SetColor(RGB(0, 0, 0));
+			}
+			else {
+				pTankPlayer->Toggle = true;
+				m_pFloorObject->SetColor(RGB(255, 0, 0));
+			}
+				break;
 		default:
 			break;
 		}
@@ -521,7 +543,94 @@ void CTankScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM 
 		break;
 	}
 }
+CGameObject* CTankScene::PickObjectPointedByCursor(int xClient, int yClient, CCamera* pCamera)
+{
 
+	XMFLOAT3 xmf3PickPosition;
+	xmf3PickPosition.x = (((2.0f * xClient) / (float)pCamera->m_Viewport.m_nWidth) - 1) / pCamera->m_xmf4x4PerspectiveProject._11;
+	xmf3PickPosition.y = -(((2.0f * yClient) / (float)pCamera->m_Viewport.m_nHeight) - 1) / pCamera->m_xmf4x4PerspectiveProject._22;
+	xmf3PickPosition.z = 1.0f;
+
+	XMVECTOR xmvPickPosition = XMLoadFloat3(&xmf3PickPosition);
+	XMMATRIX xmmtxView = XMLoadFloat4x4(&pCamera->m_xmf4x4View);
+
+	float fNearestHitDistance = FLT_MAX;
+	CGameObject* pNearestObject = NULL;
+	for (int i = 0; i < m_nTanks; i++) {
+		if (m_pTank[i])
+		{
+			int hit = m_pTank[i]->PickObjectByRayIntersection(xmvPickPosition, xmmtxView, &fNearestHitDistance);
+			if (hit > 0)
+			{
+				pNearestObject = m_pTank[i];
+			}
+		}
+	}
+	return(pNearestObject);
+
+}
+void CTankScene::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
+{
+	CTankPlayer* pTankPlayer = dynamic_cast<CTankPlayer*>(m_pPlayer);
+	switch (nMessageID)
+	{
+	case WM_RBUTTONDOWN:
+	{
+		if (pTankPlayer->Toggle) {
+			isray = true;
+
+			int x = LOWORD(lParam);
+			int y = HIWORD(lParam);
+			CCamera* pCamera = m_pPlayer->GetCamera();
+
+			// 1. 클릭 좌표를 NDC로 변환
+			float px = (2.0f * x / pCamera->m_Viewport.m_nWidth) - 1.0f;
+			float py = 1.0f - (2.0f * y / pCamera->m_Viewport.m_nHeight);
+
+			XMVECTOR pickPosNear = XMVectorSet(px, py, 0.0f, 1.0f); // z=0 (near)
+			XMVECTOR pickPosFar = XMVectorSet(px, py, 1.0f, 1.0f);  // z=1 (far)
+
+			// 2. View-Projection 역행렬 구하기
+			XMMATRIX view = XMLoadFloat4x4(&pCamera->m_xmf4x4View);
+			XMMATRIX proj = XMLoadFloat4x4(&pCamera->m_xmf4x4PerspectiveProject);
+			XMMATRIX viewProjInv = XMMatrixInverse(nullptr, XMMatrixMultiply(view, proj));
+
+			// 3. 월드 좌표로 변환
+			XMVECTOR worldNear = XMVector3TransformCoord(pickPosNear, viewProjInv);
+			XMVECTOR worldFar = XMVector3TransformCoord(pickPosFar, viewProjInv);
+
+			// 4. Ray Origin = 카메라 위치
+			XMVECTOR rayOrigin = XMLoadFloat3(&pCamera->m_xmf3Position);
+			// 5. Ray Direction = (Far - Near) 방향
+			XMVECTOR rayDirection = XMVector3Normalize(worldFar - rayOrigin);
+
+
+			// 클릭된 오브젝트 찾기
+			CGameObject* pPickedObject = PickObjectPointedByCursor(x, y, pCamera);
+
+			if (pPickedObject) {
+				for (int i = 0; i < m_nTanks; i++) {
+					if (pPickedObject == m_pTank[i]) {
+						pTankPlayer->ToggleObject = m_pTank[i];
+					}
+				}
+			}
+
+			// 6. Ray 표시용 육면체 생성
+			XMVECTOR rayTarget = XMVectorAdd(rayOrigin, XMVectorScale(rayDirection, 100.0f)); // 길이 10
+			CCubeMesh* RayMesh = new CCubeMesh(rayOrigin, rayTarget, 0.02f);
+			ray->SetMesh(RayMesh);
+
+			break;
+		}
+	}
+	case WM_RBUTTONUP:
+	{
+		isray = false;
+		break;
+	}
+	}
+}
 void CTankScene::CheckTankByBulletCollisions()
 {
 	CTankPlayer* pTankPlayer = dynamic_cast<CTankPlayer*>(m_pPlayer);
@@ -535,6 +644,7 @@ void CTankScene::CheckTankByBulletCollisions()
 					m_pTank[i]->PrepareExplosion();
 					pTankPlayer->shot = false;
 					pTankPlayer->bullet_timer = 0;
+					pTankPlayer->ToggleObject = NULL;
 				}
 			}
 		}

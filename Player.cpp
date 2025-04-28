@@ -73,6 +73,7 @@ void CPlayer::Rotate(float fPitch, float fYaw, float fRoll)
 	m_xmf3Look = Vector3::Normalize(m_xmf3Look);
 	m_xmf3Right = Vector3::Normalize(Vector3::CrossProduct(m_xmf3Up, m_xmf3Look));
 	m_xmf3Up = XMFLOAT3(0.0f, 1.0f, 0.0f);
+
 }
 
 void CPlayer::LookAt(XMFLOAT3& xmf3LookAt, XMFLOAT3& xmf3Up)
@@ -201,6 +202,9 @@ void CTankPlayer::Animate(float fElapsedTime)
 
 	if (shot) {
 		bullet_timer++;
+		if (Toggle && ToggleObject) {
+			m_pBullet->LookAt(ToggleObject->GetPosition(), m_pBullet->GetUp());
+		}
 		m_pBullet->SetPosition(Vector3::Add(m_pBullet->GetPosition(), Vector3::ScalarProduct(m_pBullet->GetLook(), fElapsedTime * 2.0f, false)));
 		if (bullet_timer >= 200) {
 			bullet_timer = 0;

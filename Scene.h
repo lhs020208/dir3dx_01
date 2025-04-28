@@ -31,8 +31,8 @@ public:
 	virtual void ReleaseObjects() override;
 	virtual void Render(HDC hDCFrameBuffer, CCamera* pCamera) override;
 	virtual void Animate(float fElapsedTime) override;
-	CGameObject* PickObjectPointedByCursor(int xClient, int yClient, CCamera* pCamera);
 
+	CGameObject* PickObjectPointedByCursor(int xClient, int yClient, CCamera* pCamera);
 	virtual void OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam) override;
 private:
 	CTitleObject* m_pTitleObjects;
@@ -44,8 +44,8 @@ public:
 	virtual void BuildObjects() override;
 	virtual void ReleaseObjects() override;
 	virtual void Render(HDC hDCFrameBuffer, CCamera* pCamera) override;
-	CGameObject* PickObjectPointedByCursor(int xClient, int yClient, CCamera* pCamera);
 
+	CGameObject* PickObjectPointedByCursor(int xClient, int yClient, CCamera* pCamera);
 	virtual void OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam) override;
 private:
 	static const int m_nCubeObjects = 5;
@@ -78,9 +78,14 @@ public:
 	virtual void Animate(float fElapsedTime) override;
 
 	virtual void OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam) override;
+	CGameObject* PickObjectPointedByCursor(int xClient, int yClient, CCamera* pCamera);
+	virtual void OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam) override;
 
 	void CTankScene::CheckTankByBulletCollisions();
 	void CTankScene::CheckPlayerByBulletCollisions();
+
+	bool isray = false;
+	CCubeObject* ray;
 private:
 	CCubeObject* m_pFloorObject;
 

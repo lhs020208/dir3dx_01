@@ -62,6 +62,70 @@ class CCubeMesh : public CMesh
 {
 public:
 	CCubeMesh(float fWidth = 4.0f, float fHeight = 4.0f, float fDepth = 4.0f);
+    CCubeMesh(const XMVECTOR& start, const XMVECTOR& end, float fWidth = 0.01f)
+        : CCubeMesh(6) // 육면체 6면
+    {
+        // 두 점 간 방향
+        XMVECTOR forward = XMVector3Normalize(end - start);
+
+        // Up 벡터 기준 설정
+        XMVECTOR worldUp = XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
+        if (fabs(XMVectorGetX(XMVector3Dot(forward, worldUp))) > 0.99f)
+            worldUp = XMVectorSet(1.0f, 0.0f, 0.0f, 0.0f);
+
+        // 직교 벡터 구성
+        XMVECTOR right = XMVector3Normalize(XMVector3Cross(worldUp, forward));
+        XMVECTOR up = XMVector3Normalize(XMVector3Cross(forward, right));
+
+        // 스케일 조정
+        right = XMVectorScale(right, fWidth * 0.5f);
+        up = XMVectorScale(up, fWidth * 0.5f);
+
+        // 베이스 위치
+        XMVECTOR base0 = start;
+        XMVECTOR base1 = end;
+
+        XMVECTOR p0_v[4] = {
+            base0 - right - up,
+            base0 + right - up,
+            base0 + right + up,
+            base0 - right + up
+        };
+        XMVECTOR p1_v[4] = {
+            base1 - right - up,
+            base1 + right - up,
+            base1 + right + up,
+            base1 - right + up
+        };
+
+        XMFLOAT3 corners[8];
+        for (int i = 0; i < 4; ++i) XMStoreFloat3(&corners[i], p0_v[i]);
+        for (int i = 0; i < 4; ++i) XMStoreFloat3(&corners[i + 4], p1_v[i]);
+
+        const int faceIndices[6][4] = {
+            {0, 1, 2, 3}, // 앞
+            {4, 5, 6, 7}, // 뒤
+            {3, 2, 6, 7}, // 위
+            {0, 1, 5, 4}, // 아래
+            {0, 3, 7, 4}, // 좌
+            {1, 2, 6, 5}  // 우
+        };
+
+        for (int i = 0; i < 6; ++i) {
+            CPolygon* poly = new CPolygon(4);
+            for (int j = 0; j < 4; ++j) {
+                XMFLOAT3 pos = corners[faceIndices[i][j]];
+                poly->SetVertex(j, CVertex(pos.x, pos.y, pos.z));
+            }
+            SetPolygon(i, poly);
+        }
+
+        // 임시 OBB 설정 (렌더에 필요)
+        XMFLOAT3 center;
+        XMStoreFloat3(&center, XMVectorScale(XMVectorAdd(start, end), 0.5f));
+        XMFLOAT3 extent = { fWidth, fWidth, XMVectorGetX(XMVector3Length(end - start)) * 0.5f };
+        m_xmOOBB = BoundingOrientedBox(center, extent, XMFLOAT4(0, 0, 0, 1));
+    }
 	virtual ~CCubeMesh() { }
 };
 
