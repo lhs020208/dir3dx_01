@@ -83,6 +83,7 @@ public:
 
 	void CTankScene::CheckTankByBulletCollisions();
 	void CTankScene::CheckPlayerByBulletCollisions();
+	void CTankScene::CheckPlayerByObjectCollisions(float fElapsedTime);
 
 	bool isray = false;
 	CCubeObject* ray;

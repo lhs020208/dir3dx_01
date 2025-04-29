@@ -655,7 +655,7 @@ void CTankScene::CheckPlayerByBulletCollisions()
 {
 	CTankPlayer* pTankPlayer = dynamic_cast<CTankPlayer*>(m_pPlayer);
 	if (pTankPlayer) {
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < m_nTanks; i++)
 		{
 			if (!pTankPlayer->OnShild) {
 				if (m_pTank[i]->IsExist() && m_pTank[i]->IsShot())
@@ -680,12 +680,38 @@ void CTankScene::CheckPlayerByBulletCollisions()
 		}
 	}
 }
+void CTankScene::CheckPlayerByObjectCollisions(float fElapsedTime)
+{
+	CTankPlayer* pTankPlayer = dynamic_cast<CTankPlayer*>(m_pPlayer);
+	if (pTankPlayer) {
+		for (int i = 0; i < m_nCubeObjects; i++)
+		{
+			if (m_pCubeObjects[i])
+				if (pTankPlayer->m_xmOOBB.Intersects(m_pCubeObjects[i]->m_xmOOBB))
+				{
+					XMFLOAT3 look = m_pPlayer->GetLook();
+					XMFLOAT3 right = m_pPlayer->GetRight();
+					XMFLOAT3 now_pos = m_pPlayer->GetPosition();
+					XMFLOAT3 moveVec = { 0.0f, 0.0f, 0.0f };
+					float speed = fElapsedTime * 1.5f;
 
+					moveVec.z -= right.z * m_pPlayer->move_x * speed;
+					moveVec.z -= right.z * m_pPlayer->move_x * speed;
+
+					moveVec.x -= look.x * m_pPlayer->move_z * speed;
+					moveVec.z -= look.z * m_pPlayer->move_z * speed;
+
+					m_pPlayer->SetPosition(now_pos.x + moveVec.x, now_pos.y, now_pos.z + moveVec.z);
+				}
+		}
+	}
+}
 void CTankScene::Animate(float fElapsedTime)
 {
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < m_nTanks; i++) {
 		m_pTank[i]->Animate(fElapsedTime);
 	}
+	CheckPlayerByObjectCollisions(fElapsedTime);
 	CTankPlayer* pTankPlayer = dynamic_cast<CTankPlayer*>(m_pPlayer);
 	pTankPlayer->Animate(fElapsedTime);
 
