@@ -86,8 +86,6 @@ public:
 	void CTankScene::CheckPlayerByObjectCollisions(float fElapsedTime);
 	void CTankScene::CheckBulletByObjectCollisions();
 
-	bool isray = false;
-	CCubeObject* ray;
 private:
 	CCubeObject* m_pFloorObject;
 
@@ -96,4 +94,7 @@ private:
 
 	static const int m_nCubeObjects = 5;
 	CCubeObject* m_pCubeObjects[m_nCubeObjects];
+
+	int GameSet = 0;
+	CTitleObject* m_pYWObjects;
 };

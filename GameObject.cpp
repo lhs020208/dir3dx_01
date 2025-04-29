@@ -452,4 +452,3 @@ void CBulletObject::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 {
 	CGameObject::Render(hDCFrameBuffer, pCamera);
 }
-

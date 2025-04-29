@@ -424,12 +424,13 @@ void CTankScene::BuildObjects()
 	m_pFloorObject->SetPosition(0.0f, -0.2f, 0.0f);
 	m_pFloorObject->UpdateBoundingBox();
 
-	CCubeMesh* RayMesh = new CCubeMesh(0.0f, 0.0f, 0.0f);
-	ray = new CCubeObject();
-	ray->SetMesh(RayMesh);
-	ray->SetColor(RGB(0, 0, 255));
-	ray->SetPosition(0.0f, 0.0f, 0.0f);
-	ray->UpdateBoundingBox();
+	CTitleMesh* cTitleMesh = new CTitleMesh("YouWin.obj");
+	m_pYWObjects = new CTitleObject();
+	m_pYWObjects->SetMesh(cTitleMesh);
+	m_pYWObjects->SetColor(RGB(255, 0, 0));
+	m_pYWObjects->SetPosition(0.0f, 1.0f, 0.0f);
+	m_pYWObjects->UpdateBoundingBox();
+
 }
 void CTankScene::ReleaseObjects()
 {
@@ -440,6 +441,7 @@ void CTankScene::ReleaseObjects()
 	}
 	for (int i = 0; i < m_nCubeObjects; i++) 
 		if (m_pCubeObjects[i])delete m_pCubeObjects[i];
+	if (m_pYWObjects) delete m_pYWObjects;
 }
 void CTankScene::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 {
@@ -455,15 +457,13 @@ void CTankScene::Render(HDC hDCFrameBuffer, CCamera* pCamera)
 			}
 		}
 	}
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < m_nTanks; i++) {
 		m_pTank[i]->Render(hDCFrameBuffer, pCamera);
 	}
 	for (int i = 0; i < m_nCubeObjects; i++) {
 		m_pCubeObjects[i]->Render(hDCFrameBuffer, pCamera);
 	}
-	if (isray) {
-		ray->Render(hDCFrameBuffer, pCamera);
-	}
+	if (m_pYWObjects && GameSet >= 10) m_pYWObjects->Render(hDCFrameBuffer, pCamera);
 }
 
 void CTankScene::OnProcessingKeyboardMessage(HWND hWnd, UINT nMessageID, WPARAM wParam, LPARAM lParam)
@@ -578,35 +578,11 @@ void CTankScene::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wPa
 	case WM_RBUTTONDOWN:
 	{
 		if (pTankPlayer->Toggle) {
-			isray = true;
 
 			int x = LOWORD(lParam);
 			int y = HIWORD(lParam);
 			CCamera* pCamera = m_pPlayer->GetCamera();
 
-			// 1. 클릭 좌표를 NDC로 변환
-			float px = (2.0f * x / pCamera->m_Viewport.m_nWidth) - 1.0f;
-			float py = 1.0f - (2.0f * y / pCamera->m_Viewport.m_nHeight);
-
-			XMVECTOR pickPosNear = XMVectorSet(px, py, 0.0f, 1.0f); // z=0 (near)
-			XMVECTOR pickPosFar = XMVectorSet(px, py, 1.0f, 1.0f);  // z=1 (far)
-
-			// 2. View-Projection 역행렬 구하기
-			XMMATRIX view = XMLoadFloat4x4(&pCamera->m_xmf4x4View);
-			XMMATRIX proj = XMLoadFloat4x4(&pCamera->m_xmf4x4PerspectiveProject);
-			XMMATRIX viewProjInv = XMMatrixInverse(nullptr, XMMatrixMultiply(view, proj));
-
-			// 3. 월드 좌표로 변환
-			XMVECTOR worldNear = XMVector3TransformCoord(pickPosNear, viewProjInv);
-			XMVECTOR worldFar = XMVector3TransformCoord(pickPosFar, viewProjInv);
-
-			// 4. Ray Origin = 카메라 위치
-			XMVECTOR rayOrigin = XMLoadFloat3(&pCamera->m_xmf3Position);
-			// 5. Ray Direction = (Far - Near) 방향
-			XMVECTOR rayDirection = XMVector3Normalize(worldFar - rayOrigin);
-
-
-			// 클릭된 오브젝트 찾기
 			CGameObject* pPickedObject = PickObjectPointedByCursor(x, y, pCamera);
 
 			if (pPickedObject) {
@@ -617,18 +593,8 @@ void CTankScene::OnProcessingMouseMessage(HWND hWnd, UINT nMessageID, WPARAM wPa
 				}
 			}
 
-			// 6. Ray 표시용 육면체 생성
-			XMVECTOR rayTarget = XMVectorAdd(rayOrigin, XMVectorScale(rayDirection, 100.0f)); // 길이 10
-			CCubeMesh* RayMesh = new CCubeMesh(rayOrigin, rayTarget, 0.02f);
-			ray->SetMesh(RayMesh);
-
 			break;
 		}
-	}
-	case WM_RBUTTONUP:
-	{
-		isray = false;
-		break;
 	}
 	}
 }
@@ -646,6 +612,7 @@ void CTankScene::CheckTankByBulletCollisions()
 					pTankPlayer->shot = false;
 					pTankPlayer->bullet_timer = 0;
 					pTankPlayer->ToggleObject = NULL;
+					GameSet++;
 				}
 			}
 		}
@@ -729,6 +696,7 @@ void CTankScene::Animate(float fElapsedTime)
 	}
 	CTankPlayer* pTankPlayer = dynamic_cast<CTankPlayer*>(m_pPlayer);
 	pTankPlayer->Animate(fElapsedTime);
+	if (m_pYWObjects && GameSet >= 10) m_pYWObjects->Animate(fElapsedTime);
 
 	CheckPlayerByObjectCollisions(fElapsedTime);
 	CheckBulletByObjectCollisions();
