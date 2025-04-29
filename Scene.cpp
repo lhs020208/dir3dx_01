@@ -378,16 +378,17 @@ void CRollerCoasterScene::Animate(float fElapsedTime)
 CTankScene::CTankScene(CPlayer* pPlayer) : CScene(pPlayer) {}
 void CTankScene::BuildObjects()
 {
+	using namespace std;
+	default_random_engine dre{ random_device{}() };
+	uniform_int_distribution<int> uid{ 0,255 };
+
+	uniform_real_distribution<float> uid_x{ 0,18.0f };
+	uniform_real_distribution<float> uid_z{ 0,18.0f };
+	uniform_int_distribution<int> uid_x_int{ -9, 9 };
+	uniform_int_distribution<int> uid_z_int{ -9, 9 };
+	uniform_real_distribution<float> uid_rot{ 0,360.0f };
 	for (int i = 0; i < m_nTanks; i++)
 	{
-		using namespace std;
-		default_random_engine dre{ random_device{}() };
-		uniform_int_distribution<int> uid{ 0,255 };
-
-		uniform_real_distribution<float> uid_x{ 0,18.0f };
-		uniform_real_distribution<float> uid_z{ 0,18.0f };
-		uniform_real_distribution<float> uid_rot{ 0,360.0f };
-
 		float red = uid(dre);
 		float green = uid(dre);
 		float blue = uid(dre);
@@ -405,15 +406,15 @@ void CTankScene::BuildObjects()
 		CBulletMesh* pBulletMesh = new CBulletMesh("Bullet.obj");
 		m_pTank[i]->bullet->SetMesh(pBulletMesh);
 		m_pTank[i]->bullet->SetColor(RGB(red, green, blue));
-		m_pTank[i]->bullet->SetPosition(-2.0f + 0.5f * i, 0.0f, 1.0f);
+		//m_pTank[i]->bullet->SetPosition(-2.0f + 0.5f * i, 0.0f, 1.0f);
 		m_pTank[i]->bullet->UpdateBoundingBox();
 	}
 	for (int i = 0; i < m_nCubeObjects; i++) {
-		CCubeMesh* pCubeMesh = new CCubeMesh(0.1f, 0.1f, 0.1f);
+		CCubeMesh* pCubeMesh = new CCubeMesh(1.0f, 1.0f, 1.0f);
 		m_pCubeObjects[i] = new CCubeObject();
 		m_pCubeObjects[i]->SetMesh(pCubeMesh);
 		m_pCubeObjects[i]->SetColor(RGB(0, 0, 255));
-		m_pCubeObjects[i]->SetPosition(-2.0f + 0.5f * i, 0.0f, 0.0f);
+		m_pCubeObjects[i]->SetPosition((float)uid_x_int(dre), 0.3f, (float)uid_z_int(dre));
 		m_pCubeObjects[i]->UpdateBoundingBox();
 	}
 	CCubeMesh* pCubeMesh = new CCubeMesh(1.0f, 0.0f, 1.0f);
