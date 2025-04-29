@@ -706,15 +706,32 @@ void CTankScene::CheckPlayerByObjectCollisions(float fElapsedTime)
 		}
 	}
 }
+void CTankScene::CheckBulletByObjectCollisions()
+{
+	CTankPlayer* pTankPlayer = dynamic_cast<CTankPlayer*>(m_pPlayer);
+	if (pTankPlayer) {
+		for (int i = 0; i < m_nCubeObjects; i++)
+		{
+			if (m_pCubeObjects[i] && pTankPlayer->shot)
+				if (pTankPlayer->m_pBullet->m_xmOOBB.Intersects(m_pCubeObjects[i]->m_xmOOBB))
+				{
+					pTankPlayer->shot = false;
+					pTankPlayer->bullet_timer = 0;
+					pTankPlayer->ToggleObject = NULL;
+				}
+		}
+	}
+}
 void CTankScene::Animate(float fElapsedTime)
 {
 	for (int i = 0; i < m_nTanks; i++) {
 		m_pTank[i]->Animate(fElapsedTime);
 	}
-	CheckPlayerByObjectCollisions(fElapsedTime);
 	CTankPlayer* pTankPlayer = dynamic_cast<CTankPlayer*>(m_pPlayer);
 	pTankPlayer->Animate(fElapsedTime);
 
+	CheckPlayerByObjectCollisions(fElapsedTime);
+	CheckBulletByObjectCollisions();
 	CheckTankByBulletCollisions();
 	CheckPlayerByBulletCollisions();
 }
